@@ -1,22 +1,17 @@
-## &lt;ngx-avatars&gt;
-[![npm version](https://badge.fury.io/js/ngx-avatars.svg)](https://badge.fury.io/js/ngx-avatars.svg) 
-[![npm](https://img.shields.io/npm/dt/ngx-avatars.svg)](https://www.npmjs.com/package/ngx-avatars) 
-[![Build Status](https://travis-ci.com/Heatmanofurioso/ngx-avatars.svg?branch=master)](https://travis-ci.org/Heatmanofurioso/ngx-avatars)
-[![Angular Style Guide](https://mgechev.github.io/angular2-style-guide/images/badge.svg)](https://angular.io/styleguide)
-![size](https://img.shields.io/bundlephobia/minzip/ngx-avatars.svg)
+## &lt;ng-hub-ui-avatar&gt;
+[![npm version](https://badge.fury.io/js/ng-hub-ui-avatar.svg)](https://badge.fury.io/js/ng-hub-ui-avatar.svg) 
+[![npm](https://img.shields.io/npm/dt/ng-hub-ui-avatar.svg)](https://www.npmjs.com/package/ng-hub-ui-avatar) 
+![size](https://img.shields.io/bundlephobia/minzip/ng-hub-ui-avatar.svg)
 
 ## NPM Project
-[ngx-avatars](https://www.npmjs.com/package/ngx-avatars)
+[ng-hub-ui-avatar](https://www.npmjs.com/package/ng-hub-ui-avatar)
 
-## Warning
-Do not confuse with [ngx-avatar](https://github.com/HaithemMosbahi/ngx-avatar) This project is it's spiritual successor, and all credit goes to HaithemMosbahi and his fellow contributors which 
-will remain in this project's contributing list.
-
-The intention of this project is to maintain and evolve the solution due to the original owner not working actively on it anymore.
+## Inspiration
+This project is a fork of [ngx-avatars](https://github.com/Heatmanofurioso/ngx-avatars), which itself was a continuation of ngx-avatar. The goal is to maintain and evolve the solution by updating it to Angular 19 and providing ongoing maintenance. All credit goes to the original authors and contributors of both projects.
 
 ## Description
 
-A universal avatar component for Angular applications that fetches / generates avatar based on the information you have about the user. The component has a fallback system that if for example an invalid Facebook ID is used it will try google ID and so on.
+A universal avatar component for Angular 19 applications that fetches / generates avatar based on the information you have about the user. The component has a fallback system that if for example an invalid Facebook ID is used it will try google ID and so on.
 
 You can use this component whether you have a single source or a multiple avatar sources. In this case the fallback system will fetch the first valid avatar.
 
@@ -262,25 +257,7 @@ export class AppModule { }
  ```
 
 ## Release Notes & History
-* 1.8.0: Migrate to Angular V18
-* 1.7.0: Migrate to Angular V17
-* 1.6.1: Migrate to Angular V16
-* 1.6.1: Migrate to Angular V16
-* 1.6.0: Migrate to Angular V16
-* 1.5.0: Migrate to Angular V15
-* 1.4.0: Migrate to Angular V14
-* 1.3.2: Add referrerpolicy configuration to img tag. Update dependencies. Remove codelyzer.
-* 1.3.1: Update dependencies
-* 1.3.0: Added ability to disable src cache.
-* 1.2.1: Updated several dependencies. Update Angular minor version. Add Husky Git Hooks. Migrate from TSLint to ESLint
-* 1.2.0: Migrate Angular to V13. Migrate RXJS to V7.4.0
-* 1.1.3: Fix package versioning in release
-* 1.1.2: Fixed build issues. 
-* 1.1.1: Fix package versioning in release
-* 1.1.0: Update Angular to V 12
-* 1.0.2: Fix production build and publish to npm registry
-* 1.0.1: Update dependencies and project structure
-* 1.0.0: Initial migration from ngx-avatar
+* 1.0.0: Initial fork from ngx-avatars, updated to Angular 19
 
 
 ## Contributing
@@ -322,6 +299,19 @@ Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protrac
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
 
+## Support the Project
+
+If you find this project helpful and would like to support its development, you can buy me a coffee:
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/carlosmorcillo)
+
+Your support is greatly appreciated and helps maintain and improve this project!
+
 ## License
 
-MIT © [Tiago Casinhas](mailto:tiago.gaspar.casinhas@gmail.com)
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/carlos-morcillo) file for details.
+
+---
+
+Made with ❤️ by [Carlos Morcillo Fernández](https://www.carlosmorcillo.com/)
+
