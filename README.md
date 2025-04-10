@@ -9,6 +9,16 @@
 ## Inspiration
 This project is a fork of [ngx-avatars](https://github.com/Heatmanofurioso/ngx-avatars), which itself was a continuation of ngx-avatar. The goal is to maintain and evolve the solution by updating it to Angular 19 and providing ongoing maintenance. All credit goes to the original authors and contributors of both projects.
 
+## Part of ng-hub-ui Family
+
+This component is part of the ng-hub-ui ecosystem, which includes:
+
+*   [ng-hub-ui-table](https://www.npmjs.com/package/ng-hub-ui-table)
+*   [ng-hub-ui-modal](https://www.npmjs.com/package/ng-hub-ui-modal)
+*   [ng-hub-ui-stepper](https://www.npmjs.com/package/ng-hub-ui-stepper)
+*   [ng-hub-ui-breadcrumbs](https://www.npmjs.com/package/ng-hub-ui-breadcrumbs)
+*   [ng-hub-ui-portal](https://www.npmjs.com/package/ng-hub-ui-portal)
+
 ## Description
 
 A universal avatar component for Angular 19 applications that fetches / generates avatar based on the information you have about the user. The component has a fallback system that if for example an invalid Facebook ID is used it will try google ID and so on.
