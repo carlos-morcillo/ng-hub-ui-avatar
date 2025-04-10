@@ -16,7 +16,6 @@ import { AsyncSource } from './sources/async-source';
 import { AvatarSource } from './sources/avatar-source.enum';
 import { Source } from './sources/source';
 import { SourceFactory } from './sources/source.factory';
-import { NgIf, NgStyle } from '@angular/common';
 
 type Style = Partial<CSSStyleDeclaration>;
 
@@ -31,7 +30,8 @@ type Style = Partial<CSSStyleDeclaration>;
 
 @Component({
 	// tslint:disable-next-line:component-selector
-	selector: 'ng-hub-ui-avatar, hub-avatar',
+	selector: 'hub-avatar',
+	standalone: false,
 	styles: [
 		`
 			:host {
@@ -39,8 +39,6 @@ type Style = Partial<CSSStyleDeclaration>;
 			}
 		`
 	],
-	standalone: true,
-	imports: [NgStyle, NgIf],
 	template: `
 		<div
 			(click)="onAvatarClicked()"

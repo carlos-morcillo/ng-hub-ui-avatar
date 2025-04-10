@@ -1,21 +1,21 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { AvatarComponent } from './avatar.component';
-import { SourceFactory } from './sources/source.factory';
-import { AvatarService } from './avatar.service';
-import { By } from '@angular/platform-browser';
-import { SimpleChange } from '@angular/core';
-import { AvatarSource } from './sources/avatar-source.enum';
-import { Observable, of, throwError } from 'rxjs';
-import { Source } from './sources/source';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { SimpleChange } from '@angular/core';
+import { By } from '@angular/platform-browser';
+import { Observable, of, throwError } from 'rxjs';
+import { AvatarComponent } from './avatar.component';
+import { AvatarService } from './avatar.service';
+import { AvatarSource } from './sources/avatar-source.enum';
+import { Source } from './sources/source';
+import { SourceFactory } from './sources/source.factory';
 
 class AvatarServiceMock {
 	fetchAvatar(avatarUrl: string): Observable<{ avatar_url: string }> {
 		return avatarUrl === 'https://api.github.com/users/github-username'
 			? of({
 					avatar_url: 'https://mocked.url/foo.jpg'
-			  })
+				})
 			: throwError(() => new Error('Mocked error for ' + avatarUrl));
 	}
 

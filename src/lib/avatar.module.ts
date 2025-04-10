@@ -1,17 +1,18 @@
-import { NgModule, ModuleWithProviders } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AvatarComponent } from './avatar.component';
-import { SourceFactory } from './sources/source.factory';
-import { AvatarService } from './avatar.service';
+import { ModuleWithProviders, NgModule } from '@angular/core';
+
 import { AvatarConfig } from './avatar-config';
-import { AVATAR_CONFIG } from './avatar-config.token';
 import { AvatarConfigService } from './avatar-config.service';
+import { AVATAR_CONFIG } from './avatar-config.token';
+import { AvatarComponent } from './avatar.component';
+import { AvatarService } from './avatar.service';
+import { SourceFactory } from './sources/source.factory';
 
 @NgModule({
-	imports: [CommonModule, AvatarComponent],
-	declarations: [],
+	imports: [CommonModule],
+	declarations: [AvatarComponent],
 	providers: [SourceFactory, AvatarService, AvatarConfigService],
-	exports: []
+	exports: [AvatarComponent]
 })
 export class AvatarModule {
 	static forRoot(

@@ -1,11 +1,11 @@
-import { AvatarConfigService } from './avatar-config.service';
-import { AvatarSource } from './sources/avatar-source.enum';
 import { AvatarConfig } from './avatar-config';
+import { AvatarConfigService } from './avatar-config.service';
 import {
-	defaultSources,
 	defaultColors,
-	defaultDisableSrcCache
+	defaultDisableSrcCache,
+	defaultSources
 } from './avatar.service';
+import { AvatarSource } from './sources/avatar-source.enum';
 
 describe('AvatarConfigService', () => {
 	describe('AvatarSources', () => {

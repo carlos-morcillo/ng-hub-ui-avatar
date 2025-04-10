@@ -1,8 +1,8 @@
-import { Injectable, Inject, Optional } from '@angular/core';
+import { Inject, Injectable, Optional } from '@angular/core';
 
-import { AvatarSource } from './sources/avatar-source.enum';
-import { AVATAR_CONFIG } from './avatar-config.token';
 import { AvatarConfig } from './avatar-config';
+import { AVATAR_CONFIG } from './avatar-config.token';
+import { AvatarSource } from './sources/avatar-source.enum';
 
 @Injectable({ providedIn: 'root' })
 export class AvatarConfigService {

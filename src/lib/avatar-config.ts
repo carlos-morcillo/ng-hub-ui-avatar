@@ -4,18 +4,18 @@ import { AvatarSource } from './sources/avatar-source.enum';
  * Represents avatar configuration object.
  */
 export interface AvatarConfig {
-  /**
-   * The avatars colors.
-   */
-  colors?: string[];
+	/**
+	 * The avatars colors.
+	 */
+	colors?: string[];
 
-  /**
-   * The order in which the avatar sources will be used.
-   */
-  sourcePriorityOrder?: AvatarSource[];
+	/**
+	 * The order in which the avatar sources will be used.
+	 */
+	sourcePriorityOrder?: AvatarSource[];
 
-  /**
-   * Disable custom source (for custom images) cache.
-   */
-  disableSrcCache?: boolean;
+	/**
+	 * Disable custom source (for custom images) cache.
+	 */
+	disableSrcCache?: boolean;
 }
