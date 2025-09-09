@@ -1,6 +1,6 @@
 import { Inject, Injectable, Optional } from '@angular/core';
 
-import { AvatarConfig } from './avatar-config';
+import type { AvatarConfig } from './avatar-config';
 import { AVATAR_CONFIG } from './avatar-config.token';
 import { AvatarSource } from './sources/avatar-source.enum';
 

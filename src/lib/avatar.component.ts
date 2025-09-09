@@ -1,12 +1,11 @@
 import {
-	Component,
-	EventEmitter,
-	Input,
-	OnChanges,
-	OnDestroy,
-	Output,
-	SecurityContext,
-	SimpleChanges
+  Component,
+  OnChanges,
+  OnDestroy,
+  SecurityContext,
+  SimpleChanges,
+  input,
+  output
 } from '@angular/core';
 
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
@@ -41,84 +40,61 @@ type Style = Partial<CSSStyleDeclaration>;
 	],
 	template: `
 		<div
-			(click)="onAvatarClicked()"
-			class="avatar-container"
-			[ngStyle]="hostStyle"
-		>
-			<img
-				*ngIf="avatarSrc; else textAvatar"
-				[src]="avatarSrc"
-				[alt]="customAlt ? customAlt : avatarAlt"
-				[width]="size"
-				[height]="size"
-				[ngStyle]="avatarStyle"
-				[referrerPolicy]="referrerpolicy"
-				(error)="fetchAvatarSource()"
-				class="avatar-content"
-				loading="lazy"
-			/>
-			<ng-template #textAvatar>
-				<div
-					*ngIf="avatarText"
-					class="avatar-content"
-					[ngStyle]="avatarStyle"
-				>
-					{{ avatarText }}
-				</div>
-			</ng-template>
+		  (click)="onAvatarClicked()"
+		  class="avatar-container"
+		  [ngStyle]="hostStyle"
+		  >
+		  @if (avatarSrc) {
+		    <img
+		      [src]="avatarSrc"
+		      [alt]="customAlt() ? customAlt() : avatarAlt"
+		      [width]="size()"
+		      [height]="size()"
+		      [ngStyle]="avatarStyle"
+		      [referrerPolicy]="referrerpolicy()"
+		      (error)="fetchAvatarSource()"
+		      class="avatar-content"
+		      loading="lazy"
+		      />
+		  } @else {
+		    @if (avatarText) {
+		      <div
+		        class="avatar-content"
+		        [ngStyle]="avatarStyle"
+		        >
+		        {{ avatarText }}
+		      </div>
+		    }
+		  }
 		</div>
-	`
+		`
 })
 export class AvatarComponent implements OnChanges, OnDestroy {
-	@Input()
-	public round = true;
-	@Input()
-	public size: string | number = 50;
-	@Input()
-	public textSizeRatio = 3;
-	@Input()
-	public bgColor: string | undefined;
-	@Input()
-	public fgColor = '#FFF';
-	@Input()
-	public borderColor: string | undefined;
-	@Input()
-	public style: Style = {};
-	@Input()
-	public cornerRadius: string | number = 0;
-	@Input('facebookId')
-	public facebook?: string | null;
-	@Input('twitterId')
-	public twitter?: string | null;
-	@Input('googleId')
-	public google?: string | null;
-	@Input('instagramId')
-	public instagram?: string | null;
-	@Input('vkontakteId')
-	public vkontakte?: string | null;
-	@Input('skypeId')
-	public skype?: string | null;
-	@Input('gravatarId')
-	public gravatar?: string | null;
-	@Input('githubId')
-	public github?: string | null;
-	@Input('src')
-	public custom?: string | SafeUrl | null;
-	@Input('alt')
-	public customAlt?: string | null;
-	@Input('name')
-	public initials?: string | null;
-	@Input()
-	public value?: string | null;
-	@Input()
-	public referrerpolicy?: string | null;
-	@Input()
-	public placeholder?: string;
-	@Input()
-	public initialsSize: string | number = 0;
+	public readonly round = input(true);
+	public readonly size = input<string | number>(50);
+	public readonly textSizeRatio = input(3);
+	public readonly bgColor = input<string>();
+	public readonly fgColor = input('#FFF');
+	public readonly borderColor = input<string>();
+	public readonly style = input<Style>({});
+	public readonly cornerRadius = input<string | number>(0);
+	public readonly facebook = input<string | null>(undefined, { alias: "facebookId" });
+	public readonly twitter = input<string | null>(undefined, { alias: "twitterId" });
+	public readonly google = input<string | null>(undefined, { alias: "googleId" });
+	public readonly instagram = input<string | null>(undefined, { alias: "instagramId" });
+	public readonly vkontakte = input<string | null>(undefined, { alias: "vkontakteId" });
+	public readonly skype = input<string | null>(undefined, { alias: "skypeId" });
+	public readonly gravatar = input<string | null>(undefined, { alias: "gravatarId" });
+	public readonly github = input<string | null>(undefined, { alias: "githubId" });
+	public readonly custom = input<string | SafeUrl | null>(undefined, { alias: "src" });
+	public readonly customAlt = input<string | null>(undefined, { alias: "alt" });
+	public readonly initials = input<string | null>(undefined, { alias: "name" });
+	public readonly value = input<string | null>();
+	public readonly referrerpolicy = input<string | null>();
+	public readonly placeholder = input<string>();
+	public readonly initialsSize = input<string | number>(0);
 
-	@Output()
-	public clickOnAvatar: EventEmitter<Source> = new EventEmitter<Source>();
+	public readonly clickOnAvatar = output<Source>();
 
 	public isAlive = true;
 	public avatarSrc: SafeUrl | null = null;
@@ -223,8 +199,8 @@ export class AvatarComponent implements OnChanges, OnDestroy {
 			this.sortAvatarSources();
 			this.fetchAvatarSource();
 			this.hostStyle = {
-				width: this.size + 'px',
-				height: this.size + 'px'
+				width: this.size() + 'px',
+				height: this.size() + 'px'
 			};
 		}
 	}
@@ -239,7 +215,7 @@ export class AvatarComponent implements OnChanges, OnDestroy {
 	}
 
 	private buildTextAvatar(avatarSource: Source): void {
-		this.avatarText = avatarSource.getAvatar(+this.initialsSize);
+		this.avatarText = avatarSource.getAvatar(+this.initialsSize());
 		this.avatarStyle = this.getInitialsStyle(avatarSource.sourceId);
 	}
 
@@ -249,9 +225,9 @@ export class AvatarComponent implements OnChanges, OnDestroy {
 			this.fetchAndProcessAsyncAvatar(avatarSource);
 		} else {
 			this.avatarSrc = this.sanitizer.bypassSecurityTrustUrl(
-				avatarSource.getAvatar(+this.size)
+				avatarSource.getAvatar(+this.size())
 			);
-			this.avatarAlt = avatarSource.getAvatar(+this.size);
+			this.avatarAlt = avatarSource.getAvatar(+this.size());
 		}
 	}
 
@@ -262,20 +238,22 @@ export class AvatarComponent implements OnChanges, OnDestroy {
 	 * memberOf AvatarComponent
 	 */
 	private getInitialsStyle(avatarValue: string): Style {
-		return {
+		const borderColor = this.borderColor();
+  const bgColor = this.bgColor();
+  return {
 			textAlign: 'center',
-			borderRadius: this.round ? '100%' : this.cornerRadius + 'px',
-			border: this.borderColor ? '1px solid ' + this.borderColor : '',
+			borderRadius: this.round() ? '100%' : this.cornerRadius() + 'px',
+			border: borderColor ? '1px solid ' + borderColor : '',
 			textTransform: 'uppercase',
-			color: this.fgColor,
-			backgroundColor: this.bgColor
-				? this.bgColor
+			color: this.fgColor(),
+			backgroundColor: bgColor
+				? bgColor
 				: this.avatarService.getRandomColor(avatarValue),
 			font:
-				Math.floor(+this.size / this.textSizeRatio) +
+				Math.floor(+this.size() / this.textSizeRatio()) +
 				'px Helvetica, Arial, sans-serif',
-			lineHeight: this.size + 'px',
-			...this.style
+			lineHeight: this.size() + 'px',
+			...this.style()
 		};
 	}
 
@@ -286,13 +264,14 @@ export class AvatarComponent implements OnChanges, OnDestroy {
 	 * memberOf AvatarComponent
 	 */
 	private getImageStyle(): Style {
-		return {
+		const borderColor = this.borderColor();
+  return {
 			maxWidth: '100%',
-			borderRadius: this.round ? '50%' : this.cornerRadius + 'px',
-			border: this.borderColor ? '1px solid ' + this.borderColor : '',
-			width: this.size + 'px',
-			height: this.size + 'px',
-			...this.style
+			borderRadius: this.round() ? '50%' : this.cornerRadius() + 'px',
+			border: borderColor ? '1px solid ' + borderColor : '',
+			width: this.size() + 'px',
+			height: this.size() + 'px',
+			...this.style()
 		};
 	}
 
@@ -308,10 +287,10 @@ export class AvatarComponent implements OnChanges, OnDestroy {
 		}
 
 		this.avatarService
-			.fetchAvatar(source.getAvatar(+this.size))
+			.fetchAvatar(source.getAvatar(+this.size()))
 			.pipe(
 				takeWhile(() => this.isAlive),
-				map((response) => source.processResponse(response, +this.size))
+				map((response) => source.processResponse(response, +this.size()))
 			)
 			.subscribe({
 				next: (avatarSrc) => (this.avatarSrc = avatarSrc),
