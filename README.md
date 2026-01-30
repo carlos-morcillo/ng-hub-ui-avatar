@@ -10,13 +10,13 @@
 
 ## Inspiration
 
-This project is a fork of [ngx-avatars](https://github.com/Heatmanofurioso/ngx-avatars), which itself was a continuation of ngx-avatar. The goal is to maintain and evolve the solution by updating it to Angular 19 and providing ongoing maintenance. All credit goes to the original authors and contributors of both projects.
+This project is a fork of [ngx-avatars](https://github.com/Heatmanofurioso/ngx-avatars), which itself was a continuation of ng-hub-ui-avatar. The goal is to maintain and evolve the solution by updating it to Angular 19 and providing ongoing maintenance. All credit goes to the original authors and contributors of both projects.
 
 ## Part of ng-hub-ui Family
 
 This component is part of the ng-hub-ui ecosystem, which includes:
 
-- [ng-hub-ui-table](https://www.npmjs.com/package/ng-hub-ui-table)
+- [ng-hub-ui-paginable](https://www.npmjs.com/package/ng-hub-ui-paginable)
 - [ng-hub-ui-modal](https://www.npmjs.com/package/ng-hub-ui-modal)
 - [ng-hub-ui-stepper](https://www.npmjs.com/package/ng-hub-ui-stepper)
 - [ng-hub-ui-breadcrumbs](https://www.npmjs.com/package/ng-hub-ui-breadcrumbs)
@@ -30,7 +30,7 @@ You can use this component whether you have a single source or a multiple avatar
 
 Moreover, the component can shows name initials or simple value as avatar.
 
-![Angular Avatar component preview](https://cdn.rawgit.com/HaithemMosbahi/ngx-avatar/0bac9072/demo.png)
+![Angular Avatar component preview](https://cdn.rawgit.com/HaithemMosbahi/ng-hub-ui-avatar/0bac9072/demo.png)
 
 Supported avatar sources:
 
@@ -48,9 +48,9 @@ Supported avatar sources:
 
 The fallback system uses the same order as the above source list, Facebook has the highest priority, if it fails, google source will be used, and so on.
 
-If you enjoy watching videos, check out this [tutorial](https://medium.com/letsboot/lets-play-with-ngx-avatar-ec585dc39161) on medium which explains how to use ngx-avatars in your angular application.
+If you enjoy watching videos, check out this [tutorial](https://medium.com/letsboot/lets-play-with-ng-hub-ui-avatar-ec585dc39161) on medium which explains how to use ng-hub-ui-avatars in your angular application.
 
-Check out this [link](https://stackblitz.com/edit/ngx-avatar-demo) to play with ngx-avatars :grinning:
+Check out this [link](https://stackblitz.com/edit/ng-hub-ui-avatar-demo) to play with ng-hub-ui-avatars :grinning:
 
 ## Installation
 
@@ -177,7 +177,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { UserService } from './user.service';
-import { AvatarModule, AvatarSource } from 'ngx-avatars';
+import { AvatarModule, AvatarSource } from 'ng-hub-ui-avatars';
 
 const avatarSourcesOrder = [AvatarSource.CUSTOM, AvatarSource.INITIALS];
 
@@ -205,7 +205,7 @@ import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
 import { UserService } from './user.service';
-import { AvatarModule } from 'ngx-avatars';
+import { AvatarModule } from 'ng-hub-ui-avatars';
 import { HttpClientModule } from '@angular/common/http';
 
 const avatarColors = ['#FFB6C1', '#2c3e50', '#95a5a6', '#f39c12', '#1abc9c'];
@@ -228,15 +228,15 @@ export class AppModule {}
 
 **Avatar Styling**
 
-In addition to the style attribute, ngx-avatar style can be customized using css classes. Thus, the generated code offers two css classes that can be overridden :
+In addition to the style attribute, ng-hub-ui-avatar style can be customized using css classes. Thus, the generated code offers two css classes that can be overridden :
 
 - **avatar-container** : class that represents the avatar container - the host element. Styles in this class will be applied on the avatar whether is an image or text.
 - **avatar-content** : css class that represents the avatar element which is embedded inside the avatar-container.
 
-To overcome Angular's view encapsulation, you may need to use the /deep/ operator to target it. Here's an example that shows how to override ngx-avatars style :
+To overcome Angular's view encapsulation, you may need to use the /deep/ operator to target it. Here's an example that shows how to override ng-hub-ui-avatars style :
 
 ```html
-<ngx-avatars class="my-avatar" value="HM"> </ngx-avatars>
+<ng-hub-ui-avatars class="my-avatar" value="HM"> </ng-hub-ui-avatars>
 ```
 
 Your css file might look like this
@@ -249,7 +249,7 @@ Your css file might look like this
 
 ## Release Notes & History
 
-- 1.0.0: Initial fork from ngx-avatars, updated to Angular 19
+- 1.0.0: Initial fork from ng-hub-ui-avatars, updated to Angular 19
 
 ## Contributing
 
@@ -293,7 +293,7 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 If you find this project helpful and would like to support its development, you can buy me a coffee:
 
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/carlosmorcillo)
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/carlosmorcillo)
 
 Your support is greatly appreciated and helps maintain and improve this project!
 
