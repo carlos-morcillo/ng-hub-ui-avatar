@@ -1,12 +1,4 @@
-import {
-  Component,
-  OnChanges,
-  OnDestroy,
-  SecurityContext,
-  SimpleChanges,
-  input,
-  output
-} from '@angular/core';
+import { Component, OnChanges, OnDestroy, SecurityContext, SimpleChanges, input, output } from '@angular/core';
 
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { map, takeWhile } from 'rxjs/operators';
@@ -16,7 +8,8 @@ import { AvatarSource } from './sources/avatar-source.enum';
 import { Source } from './sources/source';
 import { SourceFactory } from './sources/source.factory';
 
-type Style = Partial<CSSStyleDeclaration>;
+type StyleObject = Record<string, string | number | null | undefined>;
+type Style = StyleObject | string;
 
 /**
  * Universal avatar component that
@@ -31,88 +24,69 @@ type Style = Partial<CSSStyleDeclaration>;
 	// tslint:disable-next-line:component-selector
 	selector: 'hub-avatar',
 	standalone: false,
-	styles: [
-		`
-			:host {
-				border-radius: 50%;
-			}
-		`
-	],
 	template: `
-		<div
-		  (click)="onAvatarClicked()"
-		  class="avatar-container"
-		  [ngStyle]="hostStyle"
-		  >
-		  @if (avatarSrc) {
-		    <img
-		      [src]="avatarSrc"
-		      [alt]="customAlt() ? customAlt() : avatarAlt"
-		      [width]="size()"
-		      [height]="size()"
-		      [ngStyle]="avatarStyle"
-		      [referrerPolicy]="referrerpolicy()"
-		      (error)="fetchAvatarSource()"
-		      class="avatar-content"
-		      loading="lazy"
-		      />
-		  } @else {
-		    @if (avatarText) {
-		      <div
-		        class="avatar-content"
-		        [ngStyle]="avatarStyle"
-		        >
-		        {{ avatarText }}
-		      </div>
-		    }
-		  }
+		<div (click)="onAvatarClicked()" class="avatar-container" [ngStyle]="hostStyle">
+			@if (avatarSrc) {
+				<img
+					[src]="avatarSrc"
+					[alt]="customAlt() ? customAlt() : avatarAlt"
+					[width]="size()"
+					[height]="size()"
+					[ngStyle]="avatarStyle"
+					[referrerPolicy]="referrerpolicy()"
+					(error)="fetchAvatarSource()"
+					class="avatar-content"
+					loading="lazy"
+				/>
+			} @else {
+				@if (avatarText) {
+					<div class="avatar-content" [ngStyle]="avatarStyle">
+						{{ avatarText }}
+					</div>
+				}
+			}
 		</div>
-		`
+	`
 })
 export class AvatarComponent implements OnChanges, OnDestroy {
-	public readonly round = input(true);
-	public readonly size = input<string | number>(50);
-	public readonly textSizeRatio = input(3);
-	public readonly bgColor = input<string>();
-	public readonly fgColor = input('#FFF');
-	public readonly borderColor = input<string>();
-	public readonly style = input<Style>({});
-	public readonly cornerRadius = input<string | number>(0);
-	public readonly facebook = input<string | null>(undefined, { alias: "facebookId" });
-	public readonly twitter = input<string | null>(undefined, { alias: "twitterId" });
-	public readonly google = input<string | null>(undefined, { alias: "googleId" });
-	public readonly instagram = input<string | null>(undefined, { alias: "instagramId" });
-	public readonly vkontakte = input<string | null>(undefined, { alias: "vkontakteId" });
-	public readonly skype = input<string | null>(undefined, { alias: "skypeId" });
-	public readonly gravatar = input<string | null>(undefined, { alias: "gravatarId" });
-	public readonly github = input<string | null>(undefined, { alias: "githubId" });
-	public readonly custom = input<string | SafeUrl | null>(undefined, { alias: "src" });
-	public readonly customAlt = input<string | null>(undefined, { alias: "alt" });
-	public readonly initials = input<string | null>(undefined, { alias: "name" });
-	public readonly value = input<string | null>();
-	public readonly referrerpolicy = input<string | null>();
-	public readonly placeholder = input<string>();
-	public readonly initialsSize = input<string | number>(0);
+	readonly round = input(true);
+	readonly size = input<string | number>(50);
+	readonly textSizeRatio = input(3);
+	readonly bgColor = input<string>();
+	readonly fgColor = input('#FFF');
+	readonly borderColor = input<string>();
+	readonly style = input<Style>({});
+	readonly cornerRadius = input<string | number>(0);
+	readonly facebook = input<string | null>(undefined, { alias: 'facebookId' });
+	readonly gravatar = input<string | null>(undefined, { alias: 'gravatarId' });
+	readonly github = input<string | null>(undefined, { alias: 'githubId' });
+	readonly custom = input<string | SafeUrl | null>(undefined, { alias: 'src' });
+	readonly customAlt = input<string | null>(undefined, { alias: 'alt' });
+	readonly initials = input<string | null>(undefined, { alias: 'name' });
+	readonly value = input<string | null>();
+	readonly referrerpolicy = input<string | null>();
+	readonly placeholder = input<string>();
+	readonly initialsSize = input<string | number>(0);
 
-	public readonly clickOnAvatar = output<Source>();
+	readonly clickOnAvatar = output<Source>();
 
-	public isAlive = true;
-	public avatarSrc: SafeUrl | null = null;
-	public avatarAlt: SafeUrl | null = null;
-	public avatarText: string | null = null;
-	public avatarStyle: Style = {};
-	public hostStyle: Style = {};
+	isAlive = true;
+	avatarSrc: SafeUrl | null = null;
+	avatarAlt: SafeUrl | null = null;
+	avatarText: string | null = null;
+	avatarStyle: StyleObject = {};
+	hostStyle: StyleObject = {};
 
 	private currentIndex = -1;
 	private sources: Source[] = [];
 
 	constructor(
-		public sourceFactory: SourceFactory,
+		private sourceFactory: SourceFactory,
 		private avatarService: AvatarService,
 		private sanitizer: DomSanitizer
 	) {}
 
-	public onAvatarClicked(): void {
+	onAvatarClicked(): void {
 		this.clickOnAvatar.emit(this.sources[this.currentIndex]);
 	}
 
@@ -123,21 +97,15 @@ export class AvatarComponent implements OnChanges, OnDestroy {
 	 *
 	 * memberof AvatarComponent
 	 */
-	public ngOnChanges(changes: SimpleChanges): void {
+	ngOnChanges(changes: SimpleChanges): void {
 		for (const propName in changes) {
 			if (this.avatarService.isSource(propName)) {
-				const sourceType: AvatarSource =
-					AvatarSource[
-						propName.toUpperCase() as keyof typeof AvatarSource
-					];
+				const sourceType: AvatarSource = AvatarSource[propName.toUpperCase() as keyof typeof AvatarSource];
 				const currentValue = changes[propName].currentValue;
 				if (currentValue && typeof currentValue === 'string') {
 					this.addSource(sourceType, currentValue);
 				} else {
-					const sanitized = this.sanitizer.sanitize(
-						SecurityContext.URL,
-						currentValue
-					);
+					const sanitized = this.sanitizer.sanitize(SecurityContext.URL, currentValue);
 					if (sanitized) {
 						this.addSource(sourceType, sanitized);
 					} else {
@@ -146,8 +114,7 @@ export class AvatarComponent implements OnChanges, OnDestroy {
 				}
 			}
 		}
-		// reinitialize the avatar component when a source property value has changed
-		// the fallback system must be re-invoked with the new values.
+		// Reinitialize when any source input changes so fallback order is recalculated.
 		this.initializeAvatar();
 	}
 
@@ -156,7 +123,7 @@ export class AvatarComponent implements OnChanges, OnDestroy {
 	 *
 	 * memberOf AvatarComponent
 	 */
-	public fetchAvatarSource(): void {
+	fetchAvatarSource(): void {
 		const previousSource = this.sources[this.currentIndex];
 		if (previousSource) {
 			this.avatarService.markSourceAsFailed(previousSource);
@@ -186,7 +153,7 @@ export class AvatarComponent implements OnChanges, OnDestroy {
 		return null;
 	}
 
-	public ngOnDestroy(): void {
+	ngOnDestroy(): void {
 		this.isAlive = false;
 	}
 
@@ -194,23 +161,25 @@ export class AvatarComponent implements OnChanges, OnDestroy {
 	 * Initialize the avatar component and its fallback system
 	 */
 	private initializeAvatar(): void {
+		const computedBorderRadius = this.round()
+			? '50%'
+			: this.cornerRadius() + 'px';
+		this.hostStyle = {
+			width: this.size() + 'px',
+			height: this.size() + 'px',
+			borderRadius: computedBorderRadius
+		};
+
 		this.currentIndex = -1;
 		if (this.sources.length > 0) {
 			this.sortAvatarSources();
 			this.fetchAvatarSource();
-			this.hostStyle = {
-				width: this.size() + 'px',
-				height: this.size() + 'px'
-			};
 		}
 	}
 
 	private sortAvatarSources(): void {
 		this.sources.sort((source1: Source, source2: Source) =>
-			this.avatarService.compareSources(
-				source1.sourceType,
-				source2.sourceType
-			)
+			this.avatarService.compareSources(source1.sourceType, source2.sourceType)
 		);
 	}
 
@@ -224,9 +193,7 @@ export class AvatarComponent implements OnChanges, OnDestroy {
 		if (avatarSource instanceof AsyncSource) {
 			this.fetchAndProcessAsyncAvatar(avatarSource);
 		} else {
-			this.avatarSrc = this.sanitizer.bypassSecurityTrustUrl(
-				avatarSource.getAvatar(+this.size())
-			);
+			this.avatarSrc = this.sanitizer.bypassSecurityTrustUrl(avatarSource.getAvatar(+this.size()));
 			this.avatarAlt = avatarSource.getAvatar(+this.size());
 		}
 	}
@@ -237,23 +204,21 @@ export class AvatarComponent implements OnChanges, OnDestroy {
 	 *
 	 * memberOf AvatarComponent
 	 */
-	private getInitialsStyle(avatarValue: string): Style {
+	private getInitialsStyle(avatarValue: string): StyleObject {
 		const borderColor = this.borderColor();
-  const bgColor = this.bgColor();
-  return {
+		const bgColor = this.bgColor();
+		const hasCornerRadius = !this.round() || +this.cornerRadius() > 0;
+		const hasCustomFgColor = this.fgColor() !== '#FFF';
+		return {
 			textAlign: 'center',
-			borderRadius: this.round() ? '100%' : this.cornerRadius() + 'px',
-			border: borderColor ? '1px solid ' + borderColor : '',
+			borderRadius: hasCornerRadius ? (this.round() ? '100%' : this.cornerRadius() + 'px') : undefined,
+			border: borderColor ? '1px solid ' + borderColor : undefined,
 			textTransform: 'uppercase',
-			color: this.fgColor(),
-			backgroundColor: bgColor
-				? bgColor
-				: this.avatarService.getRandomColor(avatarValue),
-			font:
-				Math.floor(+this.size() / this.textSizeRatio()) +
-				'px Helvetica, Arial, sans-serif',
+			color: hasCustomFgColor ? this.fgColor() : undefined,
+			backgroundColor: bgColor ? bgColor : this.avatarService.getRandomColor(avatarValue),
+			font: Math.floor(+this.size() / this.textSizeRatio()) + 'px Helvetica, Arial, sans-serif',
 			lineHeight: this.size() + 'px',
-			...this.style()
+			...this.getCustomStyleObject()
 		};
 	}
 
@@ -263,16 +228,50 @@ export class AvatarComponent implements OnChanges, OnDestroy {
 	 *
 	 * memberOf AvatarComponent
 	 */
-	private getImageStyle(): Style {
+	private getImageStyle(): StyleObject {
 		const borderColor = this.borderColor();
-  return {
+		const hasCornerRadius = !this.round() || +this.cornerRadius() > 0;
+		return {
 			maxWidth: '100%',
-			borderRadius: this.round() ? '50%' : this.cornerRadius() + 'px',
-			border: borderColor ? '1px solid ' + borderColor : '',
+			borderRadius: hasCornerRadius ? (this.round() ? '50%' : this.cornerRadius() + 'px') : undefined,
+			border: borderColor ? '1px solid ' + borderColor : undefined,
 			width: this.size() + 'px',
 			height: this.size() + 'px',
-			...this.style()
+			...this.getCustomStyleObject()
 		};
+	}
+
+	private getCustomStyleObject(): StyleObject {
+		const customStyle = this.style();
+		if (!customStyle) {
+			return {};
+		}
+
+		if (typeof customStyle === 'string') {
+			return this.parseInlineStyleString(customStyle);
+		}
+
+		return customStyle;
+	}
+
+	private parseInlineStyleString(styleString: string): StyleObject {
+		const styleObject: StyleObject = {};
+		styleString
+			.split(';')
+			.map((declaration) => declaration.trim())
+			.filter((declaration) => declaration.length > 0)
+			.forEach((declaration) => {
+				const separatorIndex = declaration.indexOf(':');
+				if (separatorIndex <= 0) {
+					return;
+				}
+				const property = declaration.slice(0, separatorIndex).trim();
+				const value = declaration.slice(separatorIndex + 1).trim();
+				if (property && value) {
+					styleObject[property] = value;
+				}
+			});
+		return styleObject;
 	}
 
 	/**
@@ -311,9 +310,7 @@ export class AvatarComponent implements OnChanges, OnDestroy {
 		if (source) {
 			source.sourceId = sourceValue;
 		} else {
-			this.sources.push(
-				this.sourceFactory.newInstance(sourceType, sourceValue)
-			);
+			this.sources.push(this.sourceFactory.newInstance(sourceType, sourceValue));
 		}
 	}
 
@@ -323,8 +320,6 @@ export class AvatarComponent implements OnChanges, OnDestroy {
 	 * param sourceType avatar source type e.g facebook,twitter, etc.
 	 */
 	private removeSource(sourceType: AvatarSource): void {
-		this.sources = this.sources.filter(
-			(source) => source.sourceType !== sourceType
-		);
+		this.sources = this.sources.filter((source) => source.sourceType !== sourceType);
 	}
 }

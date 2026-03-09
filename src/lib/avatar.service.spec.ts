@@ -101,7 +101,7 @@ describe('AvatarService', () => {
                 expect(
                     avatarService.compareSources(
                         AvatarSource.FACEBOOK,
-                        AvatarSource.GOOGLE
+                        AvatarSource.GRAVATAR
                     )
                 ).toBeLessThan(0);
             });

@@ -7,11 +7,6 @@ This table details the functionalities of the `ng-hub-ui-avatar` library and ind
 | Category | Functionality | Example Covered |
 | :--- | :--- | :---: |
 | **Avatar Sources** | Facebook Profile | ✅ |
-| | Google Profile | ✅ |
-| | Twitter Profile | ✅ |
-| | Instagram Profile | ✅ |
-| | VKontakte Profile | ✅ |
-| | Skype Profile | ✅ |
 | | Gravatar (email/hash) | ✅ |
 | | GitHub Profile | ✅ |
 | | Custom Image Source | ✅ |

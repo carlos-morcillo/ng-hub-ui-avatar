@@ -41,20 +41,15 @@ describe('AvatarConfigService', () => {
 			const userConfig: AvatarConfig = {
 				sourcePriorityOrder: [
 					AvatarSource.INITIALS,
-					AvatarSource.TWITTER
+					AvatarSource.GRAVATAR
 				]
 			};
 			const avatarConfigService = new AvatarConfigService(userConfig);
 
 			const expectedSourcesOrder = [
 				AvatarSource.INITIALS,
-				AvatarSource.TWITTER,
-				AvatarSource.FACEBOOK,
-				AvatarSource.GOOGLE,
-				AvatarSource.INSTAGRAM,
-				AvatarSource.VKONTAKTE,
-				AvatarSource.SKYPE,
 				AvatarSource.GRAVATAR,
+				AvatarSource.FACEBOOK,
 				AvatarSource.GITHUB,
 				AvatarSource.CUSTOM,
 				AvatarSource.VALUE
@@ -76,11 +71,6 @@ describe('AvatarConfigService', () => {
 			const expectedSourcesOrder = [
 				AvatarSource.INITIALS,
 				AvatarSource.FACEBOOK,
-				AvatarSource.GOOGLE,
-				AvatarSource.TWITTER,
-				AvatarSource.INSTAGRAM,
-				AvatarSource.VKONTAKTE,
-				AvatarSource.SKYPE,
 				AvatarSource.GRAVATAR,
 				AvatarSource.GITHUB,
 				AvatarSource.CUSTOM,
