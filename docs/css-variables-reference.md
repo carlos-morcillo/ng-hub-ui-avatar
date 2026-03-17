@@ -18,23 +18,27 @@ Use these variables to customize avatar rendering without editing component sour
 
 ## How it Works
 
-The avatar styles use the token fallback chain:
+The avatar styles are encapsulated within the component using canonical tokens (`--hub-avatar-*`).
 
-```text
-component token -> sys/ref token -> literal fallback
-```
+This allows:
 
-The component also exposes runtime variables through `ngStyle` so inputs like `size`, `round`, `cornerRadius`, `bgColor`, `fgColor`, and `borderColor` map to CSS custom properties.
+- Easy customization via CSS variables on the component's host or parent.
+- Clean separation of concerns with component-level styles.
+- Runtime theming via CSS custom properties.
 
 ---
 
 ## Importing Styles
 
-Add avatar styles to your global stylesheet:
+Starting from version 21.1.0, you don't need to import a global stylesheet. The styles are now strictly encapsulated within `HubAvatarComponent`.
+
+If you were previously using:
 
 ```scss
 @use 'ng-hub-ui-avatar/src/lib/styles/avatar.scss';
 ```
+
+You can now remove this import. The component handles its own styling automatically.
 
 ---
 

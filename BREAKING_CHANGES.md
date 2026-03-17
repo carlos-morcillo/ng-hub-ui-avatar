@@ -2,6 +2,24 @@
 
 This document details the breaking changes introduced in major versions of `ng-hub-ui-avatar` and how to migrate your codebase.
 
+## Version 21.1.0
+
+### Removal of Public SCSS Entry Point
+
+The standalone file `src/lib/styles/avatar.scss` has been removed. Styles are now strictly encapsulated within the `HubAvatarComponent` via `avatar.component.scss`.
+
+**Migration Steps:**
+
+1.  **Remove manual style imports:** If you were importing the stylesheet manually in your global `styles.scss`, remove the following line:
+
+    ```scss
+    @use 'ng-hub-ui-avatar/src/lib/styles/avatar.scss';
+    ```
+
+2.  **Automatic Styling:** The component now handles its own styles. Ensure your build pipeline correctly processes component-level SCSS.
+
+3.  **Theming:** If you need to override component styles, use CSS custom properties (variables) as documented in the `css-variables-reference.md`.
+
 ## Version 21.0.0
 
 ### Angular Signals Migration

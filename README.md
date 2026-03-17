@@ -4,7 +4,7 @@
 [![npm](https://img.shields.io/npm/dt/ng-hub-ui-avatar.svg)](https://www.npmjs.com/package/ng-hub-ui-avatar)
 ![size](https://img.shields.io/bundlephobia/minzip/ng-hub-ui-avatar.svg)
 
-> **⚠️ CRITICAL (MAJOR RELEASE):** Version 21.0.0 introduces architectural breaking changes by dropping several unsupported avatar sources and migrating outputs/inputs to Angular Signals. Please read the [BREAKING_CHANGES.md](./BREAKING_CHANGES.md) file before upgrading.
+> **⚠️ BREAKING CHANGES:** Version 21.1.0 removes the need for public stylesheet imports. Styles are now encapsulated within the component. Please read the [BREAKING_CHANGES.md](./BREAKING_CHANGES.md) file before upgrading.
 
 ## NPM Project
 

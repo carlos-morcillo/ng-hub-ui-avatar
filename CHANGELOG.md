@@ -2,13 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [21.1.0] - 2026-03-17
+
+### Changed
+
+- **BREAKING CHANGE:** Internal styles are now encapsulated within `HubAvatarComponent` via `avatar.component.scss`.
+- Modernized unit tests to use `fixture.componentRef.setInput`.
+- Improved test environment configuration.
+
 ## [21.0.0] - 2026-03-09
-
-### Added
-
-- Added loading state with a spinner component to the Button component.
-- Implemented functionality to disable the Button component.
-- Allowed merging of external CSS classes in Button and Input components.
 
 ### Changed
 

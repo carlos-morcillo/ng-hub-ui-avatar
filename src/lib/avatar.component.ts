@@ -24,6 +24,7 @@ type Style = StyleObject | string;
 	// tslint:disable-next-line:component-selector
 	selector: 'hub-avatar',
 	standalone: false,
+	styleUrl: './avatar.component.scss',
 	template: `
 		<div (click)="onAvatarClicked()" class="avatar-container" [ngStyle]="hostStyle">
 			@if (avatarSrc) {

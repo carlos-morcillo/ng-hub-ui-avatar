@@ -52,7 +52,7 @@ describe('AvatarComponent', () => {
 			declarations: [AvatarComponent],
 			providers: [
 				SourceFactory,
-				provideHttpClientTesting,
+				provideHttpClientTesting(),
 				{ provide: AvatarService, useClass: AvatarServiceMock }
 			]
 		}).compileComponents();
@@ -69,7 +69,7 @@ describe('AvatarComponent', () => {
 
 	describe('AvatarText', () => {
 		it('should display the initials of the given value', () => {
-			component.initials = 'John Doe';
+			fixture.componentRef.setInput('name', 'John Doe');
 			component.ngOnChanges({
 				initials: new SimpleChange(null, 'John Doe', true)
 			});
@@ -84,8 +84,8 @@ describe('AvatarComponent', () => {
 	});
 
 	it('should not try again failed sources', () => {
-		component.gravatar = 'invalid@example.com';
-		component.initials = 'John Doe';
+		fixture.componentRef.setInput('gravatarId', 'invalid@example.com');
+		fixture.componentRef.setInput('name', 'John Doe');
 		component.ngOnChanges({
 			gravatar: new SimpleChange(null, 'invalid@example.com', true),
 			initials: new SimpleChange(null, 'John Doe', true)
@@ -99,13 +99,14 @@ describe('AvatarComponent', () => {
 		expect(avatarTextEl.nativeElement.textContent.trim()).toBe('JD');
 	});
 
-	it('should try next async source if first async source fails', () => {
-		jest.spyOn(avatarService, 'isTextAvatar').mockReturnValue(false);
-		component.google = 'invalid@example.com';
-		component.github = 'github-username';
+	it('should fall back to the next source when an async source fails', () => {
+		spyOn(avatarService, 'isTextAvatar').and.returnValue(false);
+		spyOn(avatarService, 'sourceHasFailedBefore').and.returnValue(false);
+		fixture.componentRef.setInput('githubId', 'unknown-user');
+		fixture.componentRef.setInput('src', 'https://fallback.example/avatar.png');
 		component.ngOnChanges({
-			google: new SimpleChange(null, 'invalid@example.com', true),
-			github: new SimpleChange(null, 'github-username', true)
+			github: new SimpleChange(null, 'unknown-user', true),
+			custom: new SimpleChange(null, 'https://fallback.example/avatar.png', true)
 		});
 
 		fixture.detectChanges();
@@ -114,9 +115,7 @@ describe('AvatarComponent', () => {
 			By.css('.avatar-container > img')
 		);
 		expect(avatarImgEl.nativeElement.src).toBe(
-			'https://mocked.url/foo.jpg&s=50'
+			'https://fallback.example/avatar.png'
 		);
 	});
-
-	describe('AvatarImage', () => {});
 });
