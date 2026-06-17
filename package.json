@@ -1,41 +1,38 @@
 {
-	"name": "ng-hub-ui-avatar",
-	"description": "A universal avatar component for Angular applications that fetches / generates avatar based on the information you have about the user. Supports initials, Gravatar integration, custom images and styling options. Perfect for user profiles and comment systems.",
-	"version": "21.1.0",
-	"keywords": [
-		"angular",
-		"avatar",
-		"avatars",
-		"badge",
-		"gravatar",
-		"component",
-		"initials",
-		"profile",
-		"user-profile",
-		"user-avatar",
-		"profile-picture",
-		"angular-component",
-		"ng-avatar",
-		"user-interface",
-		"ui-component"
-	],
-	"author": {
-		"name": "Carlos Morcillo Fernández",
-		"url": "https://www.carlosmorcillo.com",
-		"email": "carlos.morcillo@me.com"
-	},
-	"license": "MIT",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/carlos-morcillo/ng-hub-ui-avatar"
-	},
-	"sideEffects": false,
-	"peerDependencies": {
-		"@angular/common": ">=16.0.0",
-		"@angular/core": ">=16.0.0",
-		"tslib": "^2.6.3"
-	},
-	"allowedNonPeerDependencies": {
-		"ts-md5": "^1.3.1"
-	}
+  "name": "ng-hub-ui-avatar",
+  "description": "A universal avatar component for Angular applications that fetches / generates avatar based on the information you have about the user. Supports initials, Gravatar integration, custom images and styling options. Perfect for user profiles and comment systems.",
+  "version": "22.0.0",
+  "keywords": [
+    "angular",
+    "avatar",
+    "avatars",
+    "badge",
+    "gravatar",
+    "component",
+    "initials",
+    "profile",
+    "user-profile",
+    "user-avatar",
+    "profile-picture",
+    "angular-component",
+    "ng-avatar",
+    "user-interface",
+    "ui-component"
+  ],
+  "author": "Carlos Morcillo <carlos.morcillo@me.com> (https://www.carlosmorcillo.com)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/carlos-morcillo/ng-hub-ui-avatar"
+  },
+  "sideEffects": false,
+  "peerDependencies": {
+    "@angular/common": ">=16.0.0",
+    "@angular/core": ">=16.0.0",
+    "tslib": "^2.6.3"
+  },
+  "allowedNonPeerDependencies": {
+    "ts-md5": "^1.3.1"
+  },
+  "homepage": "https://hubui.dev/"
 }
