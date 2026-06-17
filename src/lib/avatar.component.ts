@@ -26,14 +26,14 @@ type Style = StyleObject | string;
 	standalone: false,
 	styleUrl: './avatar.component.scss',
 	template: `
-		<div (click)="onAvatarClicked()" class="avatar-container" [ngStyle]="hostStyle">
+		<div (click)="onAvatarClicked()" class="avatar-container" [style]="hostStyle">
 			@if (avatarSrc) {
 				<img
 					[src]="avatarSrc"
 					[alt]="customAlt() ? customAlt() : avatarAlt"
 					[width]="size()"
 					[height]="size()"
-					[ngStyle]="avatarStyle"
+					[style]="avatarStyle"
 					[referrerPolicy]="referrerpolicy()"
 					(error)="fetchAvatarSource()"
 					class="avatar-content"
@@ -41,7 +41,7 @@ type Style = StyleObject | string;
 				/>
 			} @else {
 				@if (avatarText) {
-					<div class="avatar-content" [ngStyle]="avatarStyle">
+					<div class="avatar-content" [style]="avatarStyle">
 						{{ avatarText }}
 					</div>
 				}
