@@ -25,10 +25,23 @@
   --hub-avatar-text-transform: uppercase;
   --hub-avatar-text-align: center;
   --hub-avatar-object-fit: cover;
+
+  // Presence status indicator (dot) — scales with --hub-avatar-size
+  --hub-avatar-status-size: calc(var(--hub-avatar-size, 50px) * 0.28);
+  --hub-avatar-status-offset: 0px;
+  --hub-avatar-status-ring-width: max(2px, calc(var(--hub-avatar-size, 50px) * 0.05));
+  --hub-avatar-status-ring-color: var(--hub-sys-surface-page, #fff);
+  --hub-avatar-status-color: var(--hub-sys-text-muted, #6c757d);
+
+  // Stacked group
+  --hub-avatar-group-overlap: calc(var(--hub-avatar-size, 50px) * 0.3);
+  --hub-avatar-group-ring-width: max(2px, calc(var(--hub-avatar-size, 50px) * 0.04));
+  --hub-avatar-group-ring-color: var(--hub-sys-surface-page, #fff);
 }
 
 :host {
   display: inline-block;
+  position: relative;
   border-radius: var(--hub-avatar-border-radius, 50%);
 }
 
@@ -67,4 +80,51 @@ img.avatar-content {
   display: block;
   object-fit: var(--hub-avatar-object-fit, cover);
   background-color: transparent;
+}
+
+// ─── Presence status indicator ───────────────────────────────────────────────
+// Opt-in dot at the bottom-end corner; the colour is re-based per built-in
+// status by the @each loop below (any custom data-status keeps the neutral
+// default unless you set --hub-avatar-status-color).
+.hub-avatar__status {
+  position: absolute;
+  inset-block-end: var(--hub-avatar-status-offset, 0px);
+  inset-inline-end: var(--hub-avatar-status-offset, 0px);
+  width: var(--hub-avatar-status-size, calc(var(--hub-avatar-size, 50px) * 0.28));
+  height: var(--hub-avatar-status-size, calc(var(--hub-avatar-size, 50px) * 0.28));
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: var(--hub-avatar-status-color, var(--hub-sys-text-muted, #6c757d));
+  box-shadow: 0 0 0 var(--hub-avatar-status-ring-width, 2px)
+    var(--hub-avatar-status-ring-color, var(--hub-sys-surface-page, #fff));
+}
+
+$hub-avatar-statuses: (online: success, away: warning, busy: danger);
+
+@each $name, $variant in $hub-avatar-statuses {
+  :host([data-status='#{$name}']) {
+    --hub-avatar-status-color: var(--hub-sys-color-#{$variant});
+  }
+}
+
+// offline stays neutral regardless of any themed default.
+:host([data-status='offline']) {
+  --hub-avatar-status-color: var(--hub-sys-text-muted, #6c757d);
+}
+
+// ─── Stacked group ───────────────────────────────────────────────────────────
+// Wrap several <hub-avatar> in a `.hub-avatar-group` to overlap them; each gets
+// a ring so the edges read cleanly.
+.hub-avatar-group {
+  display: inline-flex;
+  align-items: center;
+}
+
+.hub-avatar-group hub-avatar {
+  box-shadow: 0 0 0 var(--hub-avatar-group-ring-width, 2px)
+    var(--hub-avatar-group-ring-color, var(--hub-sys-surface-page, #fff));
+}
+
+.hub-avatar-group hub-avatar + hub-avatar {
+  margin-inline-start: calc(-1 * var(--hub-avatar-group-overlap, 15px));
 }

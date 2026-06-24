@@ -12,6 +12,12 @@ type StyleObject = Record<string, string | number | null | undefined>;
 type Style = StyleObject | string;
 
 /**
+ * Built-in semantic presence statuses for the avatar indicator dot.
+ * `online` → success · `away` → warning · `busy` → danger · `offline` → neutral.
+ */
+export type HubAvatarStatus = 'online' | 'away' | 'busy' | 'offline';
+
+/**
  * Universal avatar component that
  * generates avatar from different sources
  *
@@ -47,7 +53,14 @@ type Style = StyleObject | string;
 				}
 			}
 		</div>
-	`
+		@if (status()) {
+			<span class="hub-avatar__status" aria-hidden="true"></span>
+		}
+	`,
+	host: {
+		'[attr.data-status]': 'status() || null',
+		'[style.--hub-avatar-size]': 'avatarSizePx'
+	}
 })
 export class AvatarComponent implements OnChanges, OnDestroy {
 	readonly round = input(true);
@@ -68,6 +81,13 @@ export class AvatarComponent implements OnChanges, OnDestroy {
 	readonly referrerpolicy = input<string | null>();
 	readonly placeholder = input<string>();
 	readonly initialsSize = input<string | number>(0);
+	/**
+	 * Semantic presence indicator shown as a small dot at the bottom-end corner.
+	 * Built-ins: `online` (success) · `away` (warning) · `busy` (danger) · `offline`
+	 * (neutral). Any custom string is accepted — set `--hub-avatar-status-color`
+	 * to colour it. When unset (default) no dot is rendered.
+	 */
+	readonly status = input<HubAvatarStatus | (string & {}) | null>(null);
 
 	readonly clickOnAvatar = output<Source>();
 
@@ -89,6 +109,14 @@ export class AvatarComponent implements OnChanges, OnDestroy {
 
 	onAvatarClicked(): void {
 		this.clickOnAvatar.emit(this.sources[this.currentIndex]);
+	}
+
+	/**
+	 * The avatar size as a px string. Exposed on the host as `--hub-avatar-size`
+	 * so the status dot (and any token-driven child) scales with the avatar.
+	 */
+	get avatarSizePx(): string {
+		return (parseFloat(String(this.size())) || 50) + 'px';
 	}
 
 	/**

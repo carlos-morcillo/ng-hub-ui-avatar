@@ -1,0 +1,119 @@
+// ─────────────────────────────────────────────────────────────────────────
+// hub-avatar-theme — one-call theming for `<hub-avatar>`
+// ─────────────────────────────────────────────────────────────────────────
+//
+// Override any of the `--hub-avatar-*` design tokens in a single include. Every
+// parameter is OPTIONAL and defaults to `null`: only the parameters you pass
+// are emitted, so the rest keep the component's defaults. Token-based and
+// self-contained (no Bootstrap dependencies).
+//
+// The built-in presence statuses (online / away / busy / offline) keep their
+// semantic colours automatically; use `$status-*` here to resize / reposition
+// the dot or to colour a custom status.
+//
+// @example
+//
+//   @use 'ng-hub-ui-avatar/styles/mixins/avatar-theme' as *;
+//
+//   hub-avatar.brand {
+//     @include hub-avatar-theme(
+//       $size: 64px,
+//       $border-radius: 1rem,
+//       $bg: #ede9fe,
+//       $fg: #5b21b6,
+//       $status-ring-color: #ede9fe
+//     );
+//   }
+//
+// scss-docs-start hub-avatar-theme
+@mixin hub-avatar-theme(
+	// ── Shape & surface ──
+	$size: null,
+	$border-radius: null,
+	$border-width: null,
+	$border-color: null,
+	$bg: null,
+	$fg: null,
+	$object-fit: null,
+	// ── Typography (initials) ──
+	$font-family: null,
+	$font-weight: null,
+	$font-size: null,
+	$text-transform: null,
+	// ── Presence status dot ──
+	$status-size: null,
+	$status-offset: null,
+	$status-ring-width: null,
+	$status-ring-color: null,
+	$status-color: null,
+	// ── Stacked group ──
+	$group-overlap: null,
+	$group-ring-width: null,
+	$group-ring-color: null
+) {
+	// Shape & surface
+	@if $size != null {
+		--hub-avatar-size: #{$size};
+	}
+	@if $border-radius != null {
+		--hub-avatar-border-radius: #{$border-radius};
+	}
+	@if $border-width != null {
+		--hub-avatar-border-width: #{$border-width};
+	}
+	@if $border-color != null {
+		--hub-avatar-border-color: #{$border-color};
+	}
+	@if $bg != null {
+		--hub-avatar-bg-color: #{$bg};
+	}
+	@if $fg != null {
+		--hub-avatar-fg-color: #{$fg};
+	}
+	@if $object-fit != null {
+		--hub-avatar-object-fit: #{$object-fit};
+	}
+
+	// Typography
+	@if $font-family != null {
+		--hub-avatar-font-family: #{$font-family};
+	}
+	@if $font-weight != null {
+		--hub-avatar-font-weight: #{$font-weight};
+	}
+	@if $font-size != null {
+		--hub-avatar-font-size: #{$font-size};
+	}
+	@if $text-transform != null {
+		--hub-avatar-text-transform: #{$text-transform};
+	}
+
+	// Presence status dot
+	@if $status-size != null {
+		--hub-avatar-status-size: #{$status-size};
+	}
+	@if $status-offset != null {
+		--hub-avatar-status-offset: #{$status-offset};
+	}
+	@if $status-ring-width != null {
+		--hub-avatar-status-ring-width: #{$status-ring-width};
+	}
+	@if $status-ring-color != null {
+		--hub-avatar-status-ring-color: #{$status-ring-color};
+	}
+	@if $status-color != null {
+		--hub-avatar-status-color: #{$status-color};
+	}
+
+	// Stacked group
+	@if $group-overlap != null {
+		--hub-avatar-group-overlap: #{$group-overlap};
+	}
+	@if $group-ring-width != null {
+		--hub-avatar-group-ring-width: #{$group-ring-width};
+	}
+	@if $group-ring-color != null {
+		--hub-avatar-group-ring-color: #{$group-ring-color};
+	}
+}
+// scss-docs-end hub-avatar-theme

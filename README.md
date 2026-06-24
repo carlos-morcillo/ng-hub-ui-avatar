@@ -231,6 +231,9 @@ export class AppModule {}
 | `style`          | `Record<string, any> \| string` | `{}`        | Custom inline styles merged into avatar styles |
 | `placeholder`    | `string`                        | `undefined` | Reserved placeholder input                     |
 | `referrerpolicy` | `string \| null`                | `undefined` | Referrer policy for avatar image requests      |
+| `status`         | `HubAvatarStatus \| string \| null` | `null`  | Presence indicator dot at the bottom-end corner. Built-ins: `online` (success), `away` (warning), `busy` (danger), `offline` (neutral). Any custom string is accepted — set `--hub-avatar-status-color` to colour it. When `null` (default) no dot is rendered. |
+
+`HubAvatarStatus` is an exported type covering the built-in statuses: `'online' | 'away' | 'busy' | 'offline'`.
 
 ### Outputs
 
@@ -272,6 +275,72 @@ hub-avatar {
 	--hub-avatar-bg-color: var(--bs-primary);
 	--hub-avatar-fg-color: var(--bs-white);
 	--hub-avatar-border-color: var(--bs-border-color);
+}
+```
+
+### Presence status
+
+Set the `status` input to render a small dot at the bottom-end corner. The dot scales with the avatar (the component exposes the live size on the host as `--hub-avatar-size`).
+
+```html
+<hub-avatar name="John Doe" status="online"></hub-avatar>
+<hub-avatar name="Jane Doe" status="busy"></hub-avatar>
+<hub-avatar name="Custom" status="dnd"></hub-avatar>
+```
+
+Built-ins map to the design-system colours: `online` → success, `away` → warning, `busy` → danger, `offline` → neutral. Any custom string is accepted; colour it with `--hub-avatar-status-color`:
+
+```scss
+hub-avatar[data-status='dnd'] {
+	--hub-avatar-status-color: #9333ea;
+}
+```
+
+Status tokens:
+
+| Variable                        | Default                                                        | Usage                                  |
+| ------------------------------- | ------------------------------------------------------------- | -------------------------------------- |
+| `--hub-avatar-status-size`      | `calc(var(--hub-avatar-size, 50px) * 0.28)`                   | Diameter of the status dot             |
+| `--hub-avatar-status-offset`    | `0px`                                                         | Inset of the dot from the corner       |
+| `--hub-avatar-status-ring-width`| `max(2px, calc(var(--hub-avatar-size, 50px) * 0.05))`        | Width of the ring around the dot       |
+| `--hub-avatar-status-ring-color`| `var(--hub-sys-surface-page, #fff)`                          | Colour of the ring around the dot      |
+| `--hub-avatar-status-color`     | `var(--hub-sys-text-muted, #6c757d)`                         | Dot colour (re-based per built-in status) |
+
+### Avatar group
+
+Wrap several `<hub-avatar>` in a `.hub-avatar-group` to overlap them into a stacked group; each avatar gets a ring so the edges read cleanly.
+
+```html
+<div class="hub-avatar-group">
+	<hub-avatar name="John Doe"></hub-avatar>
+	<hub-avatar name="Jane Doe"></hub-avatar>
+	<hub-avatar name="Sam Smith"></hub-avatar>
+</div>
+```
+
+Group tokens:
+
+| Variable                       | Default                                                  | Usage                              |
+| ------------------------------ | -------------------------------------------------------- | ---------------------------------- |
+| `--hub-avatar-group-overlap`   | `calc(var(--hub-avatar-size, 50px) * 0.3)`              | Horizontal overlap between avatars |
+| `--hub-avatar-group-ring-width`| `max(2px, calc(var(--hub-avatar-size, 50px) * 0.04))`   | Ring width around each avatar      |
+| `--hub-avatar-group-ring-color`| `var(--hub-sys-surface-page, #fff)`                     | Ring colour around each avatar     |
+
+### Sass theming mixin
+
+The `hub-avatar-theme()` mixin themes an avatar in a single include — shape/surface, initials typography, the status dot and the group ring. Every parameter is optional and defaults to `null`, so only the ones you pass are emitted as `--hub-avatar-*` overrides. It is token-based, with no Bootstrap dependency.
+
+```scss
+@use 'ng-hub-ui-avatar/styles/mixins/avatar-theme' as *;
+
+hub-avatar.brand {
+	@include hub-avatar-theme(
+		$size: 64px,
+		$border-radius: 1rem,
+		$bg: #ede9fe,
+		$fg: #5b21b6,
+		$status-ring-color: #ede9fe
+	);
 }
 ```
 

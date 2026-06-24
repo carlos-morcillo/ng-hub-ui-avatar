@@ -51,9 +51,13 @@ You can now remove this import. The component handles its own styling automatica
 | `--hub-ref-color-white` | `#fff` |
 | `--hub-ref-radius-sm` | `0.25rem` |
 | `--hub-ref-border-width` | `1px` |
-| `--hub-ref-font-family-sans-serif` | `Helvetica, Arial, sans-serif` |
+| `--hub-ref-font-family-base` | `Helvetica, Arial, sans-serif` |
 | `--hub-sys-surface-page` | `#fff` |
 | `--hub-sys-text-primary` | `#212529` |
+| `--hub-sys-text-muted` | `#6c757d` |
+| `--hub-sys-color-success` | — (status `online`) |
+| `--hub-sys-color-warning` | — (status `away`) |
+| `--hub-sys-color-danger` | — (status `busy`) |
 
 ---
 
@@ -86,12 +90,34 @@ Defined and consumed by `projects/avatar/src/lib/styles/avatar.scss`.
 | --- | --- | --- |
 | `--hub-avatar-fg-color` | `var(--hub-ref-color-white, #fff)` | Text color for text avatars |
 | `--hub-avatar-bg-color` | `var(--hub-sys-surface-page, #fff)` | Background for avatar content |
-| `--hub-avatar-font-family` | `var(--hub-ref-font-family-sans-serif, Helvetica, Arial, sans-serif)` | Text avatar font family |
+| `--hub-avatar-font-family` | `var(--hub-ref-font-family-base, Helvetica, Arial, sans-serif)` | Text avatar font family |
 | `--hub-avatar-font-weight` | `400` | Text avatar font weight |
 | `--hub-avatar-font-size` | `calc(var(--hub-avatar-size, 50px) / 3)` | Text avatar font size |
 | `--hub-avatar-line-height` | `var(--hub-avatar-size, 50px)` | Text avatar line height |
 | `--hub-avatar-text-transform` | `uppercase` | Text transform for initials/value avatars |
 | `--hub-avatar-text-align` | `center` | Text alignment for text avatars |
+
+### Presence Status
+
+Opt-in dot rendered when the `status` input is set. The colour is re-based per built-in status (`online` → success, `away` → warning, `busy` → danger, `offline` → neutral); any custom status keeps the neutral default unless you set `--hub-avatar-status-color`.
+
+| Variable | Default | Usage |
+| --- | --- | --- |
+| `--hub-avatar-status-size` | `calc(var(--hub-avatar-size, 50px) * 0.28)` | Diameter of the status dot |
+| `--hub-avatar-status-offset` | `0px` | Inset of the dot from the bottom-end corner |
+| `--hub-avatar-status-ring-width` | `max(2px, calc(var(--hub-avatar-size, 50px) * 0.05))` | Width of the ring around the dot |
+| `--hub-avatar-status-ring-color` | `var(--hub-sys-surface-page, #fff)` | Colour of the ring around the dot |
+| `--hub-avatar-status-color` | `var(--hub-sys-text-muted, #6c757d)` | Dot colour (re-based per built-in status) |
+
+### Stacked Group
+
+Applied when avatars are wrapped in a `.hub-avatar-group` to overlap them; each avatar gets a ring so the edges read cleanly.
+
+| Variable | Default | Usage |
+| --- | --- | --- |
+| `--hub-avatar-group-overlap` | `calc(var(--hub-avatar-size, 50px) * 0.3)` | Horizontal overlap between avatars |
+| `--hub-avatar-group-ring-width` | `max(2px, calc(var(--hub-avatar-size, 50px) * 0.04))` | Ring width around each avatar |
+| `--hub-avatar-group-ring-color` | `var(--hub-sys-surface-page, #fff)` | Ring colour around each avatar |
 
 ---
 

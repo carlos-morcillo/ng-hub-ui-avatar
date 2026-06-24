@@ -231,6 +231,9 @@ Valores del enum `AvatarSource`: `FACEBOOK`, `GRAVATAR`, `GITHUB`, `CUSTOM`, `IN
 | `style`          | `Record<string, any> \| string` | `{}`        | Estilos en línea combinados con los del avatar    |
 | `placeholder`    | `string`                        | `undefined` | Input de placeholder reservado                    |
 | `referrerpolicy` | `string \| null`                | `undefined` | Política de referrer para las peticiones de imagen |
+| `status`         | `HubAvatarStatus \| string \| null` | `null`  | Punto indicador de presencia en la esquina inferior. Predefinidos: `online` (success), `away` (warning), `busy` (danger), `offline` (neutral). Se acepta cualquier cadena personalizada — usa `--hub-avatar-status-color` para colorearla. Cuando es `null` (por defecto) no se muestra ningún punto. |
+
+`HubAvatarStatus` es un tipo exportado que cubre los estados predefinidos: `'online' | 'away' | 'busy' | 'offline'`.
 
 ### Outputs
 
@@ -272,6 +275,72 @@ hub-avatar {
 	--hub-avatar-bg-color: var(--bs-primary);
 	--hub-avatar-fg-color: var(--bs-white);
 	--hub-avatar-border-color: var(--bs-border-color);
+}
+```
+
+### Estado de presencia
+
+Asigna el input `status` para mostrar un pequeño punto en la esquina inferior. El punto escala con el avatar (el componente expone el tamaño actual en el host como `--hub-avatar-size`).
+
+```html
+<hub-avatar name="John Doe" status="online"></hub-avatar>
+<hub-avatar name="Jane Doe" status="busy"></hub-avatar>
+<hub-avatar name="Custom" status="dnd"></hub-avatar>
+```
+
+Los predefinidos se asignan a los colores del sistema de diseño: `online` → success, `away` → warning, `busy` → danger, `offline` → neutral. Se acepta cualquier cadena personalizada; coloréala con `--hub-avatar-status-color`:
+
+```scss
+hub-avatar[data-status='dnd'] {
+	--hub-avatar-status-color: #9333ea;
+}
+```
+
+Tokens de estado:
+
+| Variable                        | Por defecto                                                   | Uso                                       |
+| ------------------------------- | ------------------------------------------------------------- | ----------------------------------------- |
+| `--hub-avatar-status-size`      | `calc(var(--hub-avatar-size, 50px) * 0.28)`                   | Diámetro del punto de estado              |
+| `--hub-avatar-status-offset`    | `0px`                                                         | Separación del punto respecto a la esquina |
+| `--hub-avatar-status-ring-width`| `max(2px, calc(var(--hub-avatar-size, 50px) * 0.05))`        | Ancho del anillo alrededor del punto      |
+| `--hub-avatar-status-ring-color`| `var(--hub-sys-surface-page, #fff)`                          | Color del anillo alrededor del punto      |
+| `--hub-avatar-status-color`     | `var(--hub-sys-text-muted, #6c757d)`                         | Color del punto (recalculado por estado predefinido) |
+
+### Grupo de avatares
+
+Envuelve varios `<hub-avatar>` en un `.hub-avatar-group` para superponerlos en un grupo apilado; cada avatar recibe un anillo para que los bordes se distingan con claridad.
+
+```html
+<div class="hub-avatar-group">
+	<hub-avatar name="John Doe"></hub-avatar>
+	<hub-avatar name="Jane Doe"></hub-avatar>
+	<hub-avatar name="Sam Smith"></hub-avatar>
+</div>
+```
+
+Tokens de grupo:
+
+| Variable                       | Por defecto                                              | Uso                                  |
+| ------------------------------ | -------------------------------------------------------- | ------------------------------------ |
+| `--hub-avatar-group-overlap`   | `calc(var(--hub-avatar-size, 50px) * 0.3)`              | Superposición horizontal entre avatares |
+| `--hub-avatar-group-ring-width`| `max(2px, calc(var(--hub-avatar-size, 50px) * 0.04))`   | Ancho del anillo de cada avatar      |
+| `--hub-avatar-group-ring-color`| `var(--hub-sys-surface-page, #fff)`                     | Color del anillo de cada avatar      |
+
+### Mixin de tematización Sass
+
+El mixin `hub-avatar-theme()` tematiza un avatar en una sola llamada — forma/superficie, tipografía de las iniciales, el punto de estado y el anillo del grupo. Cada parámetro es opcional y por defecto es `null`, así que solo se emiten como sobrescrituras `--hub-avatar-*` los que pasas. Está basado en tokens, sin dependencia de Bootstrap.
+
+```scss
+@use 'ng-hub-ui-avatar/styles/mixins/avatar-theme' as *;
+
+hub-avatar.brand {
+	@include hub-avatar-theme(
+		$size: 64px,
+		$border-radius: 1rem,
+		$bg: #ede9fe,
+		$fg: #5b21b6,
+		$status-ring-color: #ede9fe
+	);
 }
 ```
 
