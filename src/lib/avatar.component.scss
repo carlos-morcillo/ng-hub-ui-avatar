@@ -19,7 +19,7 @@
     Arial,
     sans-serif
   );
-  --hub-avatar-font-weight: 400;
+  --hub-avatar-font-weight: var(--hub-ref-font-weight-base, 400);
   --hub-avatar-font-size: calc(var(--hub-avatar-size, 50px) / 3);
   --hub-avatar-line-height: var(--hub-avatar-size, 50px);
   --hub-avatar-text-transform: uppercase;
@@ -64,7 +64,7 @@
   background-color: var(--hub-avatar-bg-color, var(--hub-sys-surface-page, #fff));
   font-family: var(--hub-avatar-font-family, Helvetica, Arial, sans-serif);
   font-size: var(--hub-avatar-font-size, calc(var(--hub-avatar-size, 50px) / 3));
-  font-weight: var(--hub-avatar-font-weight, 400);
+  font-weight: var(--hub-avatar-font-weight, var(--hub-ref-font-weight-base, 400));
   line-height: var(--hub-avatar-line-height, var(--hub-avatar-size, 50px));
   text-transform: var(--hub-avatar-text-transform, uppercase);
   text-align: var(--hub-avatar-text-align, center);
