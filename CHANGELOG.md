@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.2.0] - 2026-06-26
+
+### Added
+
+- **Projected custom content** — place any icon (`<i class="fa…">`, `<span class="material-icons">`…), an inline `<svg>`, an `<img>` or an emoji directly inside `<hub-avatar>` and it is handled agnostically: font icons inherit a sensible size while SVG/images fill the avatar, both centred with decent padding, clipped to the avatar shape (round or square) and scaling with `size`. It activates automatically when content is projected and takes precedence over the image/initials sources. The content sits on the avatar's own background (`--hub-avatar-bg-color`) with the avatar foreground colour (white), so it reads as a coloured circle out of the box; the existing `bgColor` / `fgColor` / `borderColor` / `style` inputs still apply. Two new sizing tokens: `--hub-avatar-content-padding` and `--hub-avatar-content-icon-size`.
+
+### Changed
+
+- The default `--hub-avatar-bg-color` is now the design-system accent (`--hub-sys-color-primary`) instead of the page surface, so icon/content avatars render as a coloured circle by default (matching how a milestone node fills with the accent). Initials and value avatars are unaffected — they already override the background with their own (auto-generated or `bgColor`) colour — and image avatars cover it.
+
 ## [22.1.1] - 2026-06-25
 
 ### Fixed

@@ -1,4 +1,4 @@
-import { Component, OnChanges, OnDestroy, SecurityContext, SimpleChanges, input, output } from '@angular/core';
+import { AfterContentInit, Component, ElementRef, OnChanges, OnDestroy, SecurityContext, SimpleChanges, ViewChild, input, output } from '@angular/core';
 
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { map, takeWhile } from 'rxjs/operators';
@@ -32,24 +32,27 @@ export type HubAvatarStatus = 'online' | 'away' | 'busy' | 'offline';
 	standalone: false,
 	styleUrl: './avatar.component.scss',
 	template: `
-		<div (click)="onAvatarClicked()" class="avatar-container" [style]="hostStyle">
-			@if (avatarSrc) {
-				<img
-					[src]="avatarSrc"
-					[alt]="customAlt() ? customAlt() : avatarAlt"
-					[width]="size()"
-					[height]="size()"
-					[style]="avatarStyle"
-					[referrerPolicy]="referrerpolicy()"
-					(error)="fetchAvatarSource()"
-					class="avatar-content"
-					loading="lazy"
-				/>
-			} @else {
-				@if (avatarText) {
-					<div class="avatar-content" [style]="avatarStyle">
-						{{ avatarText }}
-					</div>
+		<div (click)="onAvatarClicked()" class="avatar-container" [class.hub-avatar--custom]="hasCustomContent" [style]="hostStyle">
+			<span #customContent class="hub-avatar__custom" [style]="customContentStyle"><ng-content></ng-content></span>
+			@if (!hasCustomContent) {
+				@if (avatarSrc) {
+					<img
+						[src]="avatarSrc"
+						[alt]="customAlt() ? customAlt() : avatarAlt"
+						[width]="size()"
+						[height]="size()"
+						[style]="avatarStyle"
+						[referrerPolicy]="referrerpolicy()"
+						(error)="fetchAvatarSource()"
+						class="avatar-content"
+						loading="lazy"
+					/>
+				} @else {
+					@if (avatarText) {
+						<div class="avatar-content" [style]="avatarStyle">
+							{{ avatarText }}
+						</div>
+					}
 				}
 			}
 		</div>
@@ -62,7 +65,7 @@ export type HubAvatarStatus = 'online' | 'away' | 'busy' | 'offline';
 		'[style.--hub-avatar-size]': 'avatarSizePx'
 	}
 })
-export class AvatarComponent implements OnChanges, OnDestroy {
+export class AvatarComponent implements AfterContentInit, OnChanges, OnDestroy {
 	readonly round = input(true);
 	readonly size = input<string | number>(50);
 	readonly textSizeRatio = input(3);
@@ -91,6 +94,15 @@ export class AvatarComponent implements OnChanges, OnDestroy {
 
 	readonly clickOnAvatar = output<Source>();
 
+	/** Wrapper around the projected content (`<ng-content>`), used to detect whether the consumer projected anything. */
+	@ViewChild('customContent', { static: true }) private customContentRef?: ElementRef<HTMLElement>;
+
+	/** True when the consumer projected custom content (an icon, SVG, image, …) into the avatar. */
+	hasCustomContent = false;
+
+	/** Inline style applied to the projected-content slot (honours `bgColor` / `fgColor` / `borderColor` / `style`). */
+	customContentStyle: StyleObject = {};
+
 	isAlive = true;
 	avatarSrc: SafeUrl | null = null;
 	avatarAlt: SafeUrl | null = null;
@@ -109,6 +121,49 @@ export class AvatarComponent implements OnChanges, OnDestroy {
 
 	onAvatarClicked(): void {
 		this.clickOnAvatar.emit(this.sources[this.currentIndex]);
+	}
+
+	/**
+	 * Detects projected content once it is available and, when present, computes its style.
+	 * Runs after content init so `<ng-content>` nodes are already in place.
+	 */
+	ngAfterContentInit(): void {
+		const host = this.customContentRef?.nativeElement;
+		this.hasCustomContent = !!host && this.hasMeaningfulProjectedContent(host);
+		if (this.hasCustomContent) {
+			this.customContentStyle = this.getCustomContentStyle();
+		}
+	}
+
+	/**
+	 * Returns true when the projected slot holds a real element or non-whitespace text,
+	 * so whitespace-only projection does not flip the avatar into custom-content mode.
+	 *
+	 * @param host The element wrapping the projected content.
+	 */
+	private hasMeaningfulProjectedContent(host: HTMLElement): boolean {
+		return Array.from(host.childNodes).some(
+			(node) =>
+				node.nodeType === Node.ELEMENT_NODE ||
+				(node.nodeType === Node.TEXT_NODE && (node.textContent ?? '').trim().length > 0)
+		);
+	}
+
+	/**
+	 * Builds the inline style for the projected-content slot. Sensible visible defaults
+	 * (a themed background circle and a readable foreground colour) come from CSS tokens;
+	 * the `bgColor` / `fgColor` / `borderColor` / `style` inputs override them when set.
+	 */
+	private getCustomContentStyle(): StyleObject {
+		const borderColor = this.borderColor();
+		const bgColor = this.bgColor();
+		const hasCustomFgColor = this.fgColor() !== '#FFF';
+		return {
+			backgroundColor: bgColor ? bgColor : undefined,
+			color: hasCustomFgColor ? this.fgColor() : undefined,
+			border: borderColor ? '1px solid ' + borderColor : undefined,
+			...this.getCustomStyleObject()
+		};
 	}
 
 	/**
@@ -145,6 +200,9 @@ export class AvatarComponent implements OnChanges, OnDestroy {
 		}
 		// Reinitialize when any source input changes so fallback order is recalculated.
 		this.initializeAvatar();
+		if (this.hasCustomContent) {
+			this.customContentStyle = this.getCustomContentStyle();
+		}
 	}
 
 	/**

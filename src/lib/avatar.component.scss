@@ -12,7 +12,10 @@
   --hub-avatar-border-width: 0;
   --hub-avatar-border-color: transparent;
   --hub-avatar-fg-color: var(--hub-ref-color-white, #fff);
-  --hub-avatar-bg-color: var(--hub-sys-surface-page, #fff);
+  // Accent fill by default (like a milestone node) so icon/content avatars read
+  // as a coloured circle out of the box. Initials/value avatars override this
+  // with their own (auto/`bgColor`) colour; images cover it.
+  --hub-avatar-bg-color: var(--hub-sys-color-primary, #0d6efd);
   --hub-avatar-font-family: var(
     --hub-ref-font-family-base,
     Helvetica,
@@ -25,6 +28,13 @@
   --hub-avatar-text-transform: uppercase;
   --hub-avatar-text-align: center;
   --hub-avatar-object-fit: cover;
+
+  // Projected custom content (icon / SVG / image placed inside <hub-avatar>).
+  // Only sizing is content-specific; the background and foreground are the
+  // avatar's own (--hub-avatar-bg-color / --hub-avatar-fg-color). Sizes are
+  // relative to --hub-avatar-size so they scale with the avatar.
+  --hub-avatar-content-padding: calc(var(--hub-avatar-size, 50px) * 0.2);
+  --hub-avatar-content-icon-size: calc(var(--hub-avatar-size, 50px) * 0.55);
 
   // Presence status indicator (dot) — scales with --hub-avatar-size
   --hub-avatar-status-size: calc(var(--hub-avatar-size, 50px) * 0.28);
@@ -80,6 +90,53 @@ img.avatar-content {
   display: block;
   object-fit: var(--hub-avatar-object-fit, cover);
   background-color: transparent;
+}
+
+// ─── Projected custom content ────────────────────────────────────────────────
+// Drop any icon (`<i class="fa…">`, `<span class="material-icons">`…), an inline
+// `<svg>`, an `<img>` or an emoji directly inside `<hub-avatar>`. The slot sizes
+// it agnostically: font icons inherit `--hub-avatar-content-icon-size`, while
+// SVG/img fill the padded box. A themed circle background and a readable
+// foreground are the defaults (override with `bgColor` / `fgColor` or the tokens).
+.hub-avatar__custom {
+  display: none;
+}
+
+.hub-avatar--custom .hub-avatar__custom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: var(--hub-avatar-content-padding, calc(var(--hub-avatar-size, 50px) * 0.2));
+  border-radius: inherit;
+  overflow: hidden;
+  // The circle is the avatar's own background (accent by default); the icon uses
+  // the avatar foreground (white) for contrast. `bgColor` / `fgColor` override both.
+  background-color: var(--hub-avatar-bg-color, var(--hub-sys-color-primary, #0d6efd));
+  color: var(--hub-avatar-fg-color, var(--hub-ref-color-white, #fff));
+  font-size: var(--hub-avatar-content-icon-size, calc(var(--hub-avatar-size, 50px) * 0.55));
+  line-height: 1;
+}
+
+// Font-based icons and emoji inherit the font-size and colour above, so they
+// scale and theme with no extra wiring.
+.hub-avatar--custom .hub-avatar__custom > * {
+  line-height: 1;
+}
+
+// Inline SVG and <img> are sized by box, not font-size: make them fill the
+// padded area while preserving aspect ratio. `::ng-deep` pierces the emulated
+// encapsulation so the projected children (owned by the consumer) are reached.
+.hub-avatar--custom .hub-avatar__custom ::ng-deep svg,
+.hub-avatar--custom .hub-avatar__custom ::ng-deep img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
 }
 
 // ─── Presence status indicator ───────────────────────────────────────────────

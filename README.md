@@ -79,6 +79,7 @@ Fallback uses a source priority order. By default, the component tries the suppo
 ## Features
 
 - **Multiple Sources**: Gravatar, GitHub, Facebook, custom images, initials and plain text.
+- **Projected Custom Content**: Drop any icon (FontAwesome, Material…), inline SVG, image or emoji inside `<hub-avatar>` and it is sized, centered and padded agnostically.
 - **Automatic Fallback**: Configurable source priority order with graceful fallback when a source fails.
 - **Initials Generation**: Builds initials avatars from a name with auto-generated background colors.
 - **Async Remote Sources**: Resolves remote avatars (for example Gravatar) over HTTP with caching support.
@@ -172,6 +173,28 @@ export class ProfileComponent {}
 	[round]="true"
 ></hub-avatar>
 ```
+
+### Custom content (icons, SVG, images)
+
+Project any content directly inside `<hub-avatar>` — an icon from any library, an inline `<svg>`, an `<img>` or even an emoji — and the avatar handles it agnostically: it centers the content, applies decent padding and clips it to the avatar shape (round or square). Font icons inherit a size and colour; inline SVG/images fill the avatar. Everything scales with `size`.
+
+```html
+<!-- FontAwesome (or any icon font) -->
+<hub-avatar><i class="fa-solid fa-user"></i></hub-avatar>
+
+<!-- Material Symbols -->
+<hub-avatar size="72"><span class="material-symbols-outlined">rocket_launch</span></hub-avatar>
+
+<!-- Inline SVG -->
+<hub-avatar size="64">
+	<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 2 7l10 5 10-5-10-5Z" /></svg>
+</hub-avatar>
+
+<!-- Emoji -->
+<hub-avatar>🚀</hub-avatar>
+```
+
+It activates automatically whenever content is projected and takes precedence over the image/initials sources. The circle uses the avatar's own background (`--hub-avatar-bg-color`, the design-system accent by default) with a white foreground, so it reads as a coloured circle out of the box. Theme it with the regular `bgColor` / `fgColor` / `borderColor` inputs, and tune the sizing with the `--hub-avatar-content-*` tokens (see [Styling](#styling)).
 
 ### Module configuration (`forRoot`)
 
@@ -275,6 +298,23 @@ hub-avatar {
 	--hub-avatar-bg-color: var(--bs-primary);
 	--hub-avatar-fg-color: var(--bs-white);
 	--hub-avatar-border-color: var(--bs-border-color);
+}
+```
+
+### Custom content
+
+When you project content into `<hub-avatar>` (see [Custom content](#custom-content-icons-svg-images)), the **background is the avatar's own** (`--hub-avatar-bg-color`, the **accent colour by default**) and the icon uses the **avatar foreground** (`--hub-avatar-fg-color`, white) — so it reads as a coloured circle out of the box. Theme it with the regular `bgColor` / `fgColor` inputs (or `--hub-avatar-bg-color` / `--hub-avatar-fg-color`) just like any other avatar. Two extra tokens control the projected content's **sizing**, both relative to `--hub-avatar-size`:
+
+| Token                            | Default                               | Description                                                          |
+| -------------------------------- | ------------------------------------- | ------------------------------------------------------------------- |
+| `--hub-avatar-content-padding`   | `calc(var(--hub-avatar-size) * 0.2)`  | Breathing room between the projected content and the avatar edge.   |
+| `--hub-avatar-content-icon-size` | `calc(var(--hub-avatar-size) * 0.55)` | Font size for icon fonts / emoji (inherited by the projected glyph). |
+
+```scss
+hub-avatar {
+	--hub-avatar-bg-color: #e7f1ff; // the avatar's own background — also the content circle
+	--hub-avatar-fg-color: #0d6efd; // icon colour (or set the `fgColor` input)
+	--hub-avatar-content-icon-size: calc(var(--hub-avatar-size) * 0.6);
 }
 ```
 

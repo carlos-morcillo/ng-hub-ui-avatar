@@ -79,6 +79,7 @@ La reserva utiliza un orden de prioridad de fuentes. Por defecto, el componente 
 ## Características
 
 - **Múltiples fuentes**: Gravatar, GitHub, Facebook, imágenes personalizadas, iniciales y texto plano.
+- **Contenido personalizado proyectado**: coloca cualquier icono (FontAwesome, Material…), un SVG en línea, una imagen o un emoji dentro de `<hub-avatar>` y se dimensiona, centra y espacia de forma agnóstica.
 - **Reserva automática**: orden de prioridad de fuentes configurable con reserva elegante cuando una fuente falla.
 - **Generación de iniciales**: crea avatares de iniciales a partir de un nombre con colores de fondo autogenerados.
 - **Fuentes remotas asíncronas**: resuelve avatares remotos (por ejemplo Gravatar) por HTTP con soporte de caché.
@@ -172,6 +173,28 @@ export class ProfileComponent {}
 	[round]="true"
 ></hub-avatar>
 ```
+
+### Contenido personalizado (iconos, SVG, imágenes)
+
+Proyecta cualquier contenido directamente dentro de `<hub-avatar>` — un icono de cualquier biblioteca, un `<svg>` en línea, una `<img>` o incluso un emoji — y el avatar lo gestiona de forma agnóstica: lo centra, aplica un padding decente y lo recorta a la forma del avatar (redondo o cuadrado). Los iconos de fuente heredan tamaño y color; los SVG/imágenes en línea rellenan el avatar. Todo escala con `size`.
+
+```html
+<!-- FontAwesome (o cualquier fuente de iconos) -->
+<hub-avatar><i class="fa-solid fa-user"></i></hub-avatar>
+
+<!-- Material Symbols -->
+<hub-avatar size="72"><span class="material-symbols-outlined">rocket_launch</span></hub-avatar>
+
+<!-- SVG en línea -->
+<hub-avatar size="64">
+	<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 2 7l10 5 10-5-10-5Z" /></svg>
+</hub-avatar>
+
+<!-- Emoji -->
+<hub-avatar>🚀</hub-avatar>
+```
+
+Se activa automáticamente cuando proyectas contenido y tiene prioridad sobre las fuentes de imagen/iniciales. El círculo usa el fondo propio del avatar (`--hub-avatar-bg-color`, el color de acento por defecto) con un primer plano blanco, así que se ve como un círculo de color sin configurar nada. Tematízalo con los inputs habituales `bgColor` / `fgColor` / `borderColor`, y ajusta el tamaño con los tokens `--hub-avatar-content-*` (ver [Estilos](#estilos)).
 
 ### Configuración del módulo (`forRoot`)
 
@@ -275,6 +298,23 @@ hub-avatar {
 	--hub-avatar-bg-color: var(--bs-primary);
 	--hub-avatar-fg-color: var(--bs-white);
 	--hub-avatar-border-color: var(--bs-border-color);
+}
+```
+
+### Contenido personalizado
+
+Cuando proyectas contenido dentro de `<hub-avatar>` (ver [Contenido personalizado](#contenido-personalizado-iconos-svg-im%C3%A1genes)), el **fondo es el del propio avatar** (`--hub-avatar-bg-color`, el **color de acento por defecto**) y el icono usa el **primer plano del avatar** (`--hub-avatar-fg-color`, blanco) — así que se ve como un círculo de color sin configurar nada. Tematízalo con los inputs habituales `bgColor` / `fgColor` (o `--hub-avatar-bg-color` / `--hub-avatar-fg-color`) como cualquier otro avatar. Dos tokens extra controlan el **tamaño** del contenido proyectado, ambos relativos a `--hub-avatar-size`:
+
+| Token                            | Por defecto                           | Descripción                                                          |
+| -------------------------------- | ------------------------------------- | -------------------------------------------------------------------- |
+| `--hub-avatar-content-padding`   | `calc(var(--hub-avatar-size) * 0.2)`  | Espacio entre el contenido proyectado y el borde del avatar.         |
+| `--hub-avatar-content-icon-size` | `calc(var(--hub-avatar-size) * 0.55)` | Tamaño de fuente para iconos de fuente / emoji (lo hereda el glifo). |
+
+```scss
+hub-avatar {
+	--hub-avatar-bg-color: #e7f1ff; // el fondo propio del avatar — también el círculo del contenido
+	--hub-avatar-fg-color: #0d6efd; // color del icono (o usa el input `fgColor`)
+	--hub-avatar-content-icon-size: calc(var(--hub-avatar-size) * 0.6);
 }
 ```
 

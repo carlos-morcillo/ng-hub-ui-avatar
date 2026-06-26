@@ -89,13 +89,22 @@ Defined and consumed by `projects/avatar/src/lib/styles/avatar.scss`.
 | Variable | Default | Usage |
 | --- | --- | --- |
 | `--hub-avatar-fg-color` | `var(--hub-ref-color-white, #fff)` | Text color for text avatars |
-| `--hub-avatar-bg-color` | `var(--hub-sys-surface-page, #fff)` | Background for avatar content |
+| `--hub-avatar-bg-color` | `var(--hub-sys-color-primary, #0d6efd)` | Background for avatar content (accent by default; initials/value override it, images cover it) |
 | `--hub-avatar-font-family` | `var(--hub-ref-font-family-base, Helvetica, Arial, sans-serif)` | Text avatar font family |
 | `--hub-avatar-font-weight` | `400` | Text avatar font weight |
 | `--hub-avatar-font-size` | `calc(var(--hub-avatar-size, 50px) / 3)` | Text avatar font size |
 | `--hub-avatar-line-height` | `var(--hub-avatar-size, 50px)` | Text avatar line height |
 | `--hub-avatar-text-transform` | `uppercase` | Text transform for initials/value avatars |
 | `--hub-avatar-text-align` | `center` | Text alignment for text avatars |
+
+### Custom Content
+
+Applied to content projected into `<hub-avatar>` (an icon, inline SVG, image or emoji). The background and foreground are the avatar's own (`--hub-avatar-bg-color` / `--hub-avatar-fg-color`); only these sizing tokens are content-specific, defaulting relative to `--hub-avatar-size` so they scale with the avatar.
+
+| Variable | Default | Usage |
+| --- | --- | --- |
+| `--hub-avatar-content-padding` | `calc(var(--hub-avatar-size, 50px) * 0.2)` | Padding between the projected content and the avatar edge |
+| `--hub-avatar-content-icon-size` | `calc(var(--hub-avatar-size, 50px) * 0.55)` | Font size for icon fonts / emoji (inherited by the glyph) |
 
 ### Presence Status
 
