@@ -12,6 +12,10 @@
 
 // Default semantic colour map → design-system `--hub-sys-color-*` tokens.
 // Pass your own map (or extend this one) to `hub-avatar-color-variants()`.
+// Mirrors the open accent set (9 canonical variants); each entry feeds the
+// avatar's `--hub-avatar-accent` slot, so the circle fill and its legible
+// foreground (`-on`) follow automatically. Add custom colours (e.g. `brand`) to
+// this map — or pass your own map — and they work the same way.
 $hub-avatar-semantic-colors: (
 	'primary': var(--hub-sys-color-primary),
 	'secondary': var(--hub-sys-color-secondary),
@@ -19,18 +23,22 @@ $hub-avatar-semantic-colors: (
 	'danger': var(--hub-sys-color-danger),
 	'warning': var(--hub-sys-color-warning),
 	'info': var(--hub-sys-color-info),
+	'neutral': var(--hub-sys-color-neutral),
 	'light': var(--hub-sys-color-light),
 	'dark': var(--hub-sys-color-dark)
 ) !default;
 
 // ── hub-avatar-color-variants ────────────────────────────────────────────────
 // In ONE loop over `$colors`, emit a coloured-circle variant of the AVATAR and a
-// coloured variant of its BADGE for every entry. The eight semantic colours
+// coloured variant of its BADGE for every entry. The avatar circle re-bases the
+// single `--hub-avatar-accent` slot (not `--hub-avatar-bg-color` directly), so
+// the fill and its legible foreground (`--hub-avatar-accent-on`) follow from one
+// value — light accents get dark text automatically. The nine canonical colours
 // already work out of the box; use this to (re)emit them in your own global CSS,
 // or to register custom colours.
 //
 // @example
-//   @include avatar.hub-avatar-color-variants();                          // the 8 semantic
+//   @include avatar.hub-avatar-color-variants();                          // the 9 semantic
 //   @include avatar.hub-avatar-color-variants(('brand': var(--brand)));   // custom colour
 //
 //   <hub-avatar class="hub-avatar--brand">    → brand-coloured circle
@@ -38,7 +46,7 @@ $hub-avatar-semantic-colors: (
 @mixin hub-avatar-color-variants($colors: $hub-avatar-semantic-colors) {
 	@each $name, $color in $colors {
 		hub-avatar.hub-avatar--#{$name} {
-			--hub-avatar-bg-color: #{$color};
+			--hub-avatar-accent: #{$color};
 		}
 
 		hub-avatar[data-badge-color='#{$name}'] {

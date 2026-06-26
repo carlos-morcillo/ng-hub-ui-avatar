@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.4.0] - 2026-06-26
+
+### Changed
+
+- **Accent system migrated to the open-set "local accent slot" pattern.** A coloured-circle avatar variant now re-bases a single `--hub-avatar-accent` slot (instead of `--hub-avatar-bg-color` directly), and the role family — `--hub-avatar-accent-emphasis`, `--hub-avatar-accent-subtle` and the new `--hub-avatar-accent-on` (contrast colour) — is derived **locally** from it with `color-mix(in oklch, …)` / relative color, mirroring the `ng-hub-ui-ds` engine. The circle fill (`--hub-avatar-bg-color`) feeds from the slot and the foreground (`--hub-avatar-fg-color`) now defaults to `--hub-avatar-accent-on`, so **light accents (e.g. `light`) get legible dark text automatically**. The built-in variant list and the `$hub-avatar-semantic-colors` Sass map were extended from 8 to the **nine canonical accents** (added `neutral`). The `hub-avatar-color-variants()` mixin (and its default map — **preserved**) now feed the accent slot, so any custom accent (e.g. `brand`) works the same way with no recompilation.
+
+### Added
+
+- New tokens `--hub-avatar-accent` (the semantic slot), `--hub-avatar-accent-emphasis`, `--hub-avatar-accent-subtle` and `--hub-avatar-accent-on`.
+
+### Notes
+
+- The runtime `bgColor` / `fgColor` inputs (applied as inline styles) are unaffected and continue to override the slot-fed defaults. The independent `$bg` / `$fg` parameters of `hub-avatar-theme()` keep their existing behaviour (explicit surface overrides, not the semantic slot).
+
 ## [22.3.0] - 2026-06-26
 
 ### Changed (BREAKING)

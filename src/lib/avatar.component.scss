@@ -11,11 +11,21 @@
   --hub-avatar-border-width-default: var(--hub-ref-border-width, 1px);
   --hub-avatar-border-width: 0;
   --hub-avatar-border-color: transparent;
-  --hub-avatar-fg-color: var(--hub-ref-color-white, #fff);
+  // Semantic accent — a single slot that the colour variants re-base (@each /
+  // map below). The role family is derived LOCALLY from it, mirroring the ds
+  // engine, so any accent — a known variant or a custom `brand` — yields a
+  // coherent circle fill + legible foreground with no recompilation. `-on` is a
+  // grayscale contrast flip driven by the accent's own lightness: it feeds the
+  // foreground so light accents (e.g. `light`) read with dark text out of the box.
+  --hub-avatar-accent: var(--hub-sys-color-primary, #0d6efd);
+  --hub-avatar-accent-emphasis: color-mix(in oklch, var(--hub-avatar-accent) 80%, var(--hub-sys-color-ink, #212529));
+  --hub-avatar-accent-subtle: color-mix(in oklch, var(--hub-avatar-accent) 12%, var(--hub-sys-surface-page, #fff));
+  --hub-avatar-accent-on: oklch(from var(--hub-avatar-accent) clamp(0, (0.62 - l) * 1000, 1) 0 h);
+  --hub-avatar-fg-color: var(--hub-avatar-accent-on, var(--hub-ref-color-white, #fff));
   // Accent fill by default (like a milestone node) so icon/content avatars read
-  // as a coloured circle out of the box. Initials/value avatars override this
-  // with their own (auto/`bgColor`) colour; images cover it.
-  --hub-avatar-bg-color: var(--hub-sys-color-primary, #0d6efd);
+  // as a coloured circle out of the box. Fed from the accent slot. Initials/value
+  // avatars override this with their own (auto/`bgColor`) colour; images cover it.
+  --hub-avatar-bg-color: var(--hub-avatar-accent, var(--hub-sys-color-primary, #0d6efd));
   --hub-avatar-font-family: var(
     --hub-ref-font-family-base,
     Helvetica,
@@ -180,21 +190,36 @@ img.avatar-content {
   line-height: 1;
 }
 
-// Built-in semantic variants: badge colour (per `badgeColor`) and a coloured
-// avatar circle (per a `.hub-avatar--<name>` host class). Same loop the public
-// `hub-avatar-color-variants()` mixin runs, kept here so both work out of the box.
-$hub-avatar-semantic: primary, secondary, success, danger, warning, info, light, dark;
+// Built-in semantic variants (open set): badge colour (per `badgeColor`) and a
+// coloured avatar circle (per a `.hub-avatar--<name>` host class). Same loop the
+// public `hub-avatar-color-variants()` mixin runs, kept here so both work out of
+// the box. The avatar circle re-bases the single `--hub-avatar-accent` slot, so
+// the fill (`--hub-avatar-bg-color`) and the legible foreground (`--hub-avatar-
+// accent-on`) follow automatically — light accents get dark text for free. The
+// nine canonical variants are emitted here.
+$hub-avatar-semantic: primary, secondary, success, danger, warning, info, neutral, light, dark;
 
 @each $name in $hub-avatar-semantic {
   :host([data-badge-color='#{$name}']) {
     --hub-avatar-badge-color: var(--hub-sys-color-#{$name});
   }
   :host(.hub-avatar--#{$name}) {
-    --hub-avatar-bg-color: var(--hub-sys-color-#{$name});
+    --hub-avatar-accent: var(--hub-sys-color-#{$name});
   }
 }
 
-// Light backgrounds need dark text for legible labels.
+// Open-set escape hatch — any custom accent (e.g. a `brand` the host app adds to
+// the ds `$hub-accents` map) works with ONE CSS rule that re-bases the accent
+// slot; the fill + legible foreground re-derive locally from it, with no
+// per-variant boilerplate and no recompilation:
+//
+//   hub-avatar.hub-avatar--brand { --hub-avatar-accent: var(--hub-sys-color-brand); }
+//   hub-avatar[data-badge-color='brand'] { --hub-avatar-badge-color: var(--hub-sys-color-brand); }
+//
+// (`hub-avatar-color-variants(('brand': …))` emits both rules in one include.)
+
+// Badge labels: light badge fills need dark text. The badge colour is independent
+// of the avatar accent slot (set via `badgeColor`), so it keeps its own fixup.
 :host([data-badge-color='warning']),
 :host([data-badge-color='light']) {
   --hub-avatar-badge-text-color: var(--hub-sys-text-primary, #212529);
