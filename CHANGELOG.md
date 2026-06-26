@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.3.0] - 2026-06-26
+
+### Changed (BREAKING)
+
+- **`status` → `badge`.** The presence-only `status` input is replaced by a general **`badge`** overlay: `badge` (bare/empty) or `[badge]="true"` renders a **dot**; `badge="4k"` / `[badge]="9"` renders a **labelled pill**; `null` / absent renders nothing. Colour comes from a **semantic** `badgeColor` input — `primary · secondary · success · danger · warning · info · light · dark` (→ `--hub-sys-color-*`). Presence is now expressed through the colour: online → `success`, away → `warning`, busy → `danger`, offline → `secondary`. The `HubAvatarStatus` type is renamed to `HubAvatarBadgeColor`, and the `--hub-avatar-status-*` tokens to `--hub-avatar-badge-*`. **Migration:** `status="online"` → `badge badgeColor="success"`. See `BREAKING_CHANGES.md`.
+
+### Added
+
+- **Semantic colour variants for both the avatar and its badge**, generated in one loop. Out of the box: a coloured-circle avatar variant per semantic colour (`<hub-avatar class="hub-avatar--success">`) and the matching `badgeColor`.
+- **`hub-avatar-color-variants($colors)` mixin** — emit those avatar + badge colour variants in your own CSS, defaulting to the eight semantic colours or your own map (e.g. a brand colour). Plus **`hub-avatar-badge-color($color)`** and new `$content-*` / `$badge-*` parameters on `hub-avatar-theme()`.
+- New tokens: `--hub-avatar-badge-color` / `-text-color` / `-size` / `-offset` / `-ring-width` / `-ring-color` / `-font-size` / `-padding`.
+
 ## [22.2.1] - 2026-06-26
 
 ### Fixed

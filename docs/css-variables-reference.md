@@ -106,17 +106,20 @@ Applied to content projected into `<hub-avatar>` (an icon, inline SVG, image or 
 | `--hub-avatar-content-padding` | `calc(var(--hub-avatar-size, 50px) * 0.2)` | Padding between the projected content and the avatar edge |
 | `--hub-avatar-content-icon-size` | `calc(var(--hub-avatar-size, 50px) * 0.55)` | Font size for icon fonts / emoji (inherited by the glyph) |
 
-### Presence Status
+### Badge
 
-Opt-in dot rendered when the `status` input is set. The colour is re-based per built-in status (`online` → success, `away` → warning, `busy` → danger, `offline` → neutral); any custom status keeps the neutral default unless you set `--hub-avatar-status-color`.
+Opt-in corner overlay: a plain **dot** (`badge`) or a **labelled** pill (`badge="4k"`). Colour it with the `badgeColor` input — the semantic value re-bases `--hub-avatar-badge-color` to `--hub-sys-color-<name>` (express presence with the colour: online → success, away → warning, busy → danger, offline → secondary). Light backgrounds (`warning` / `light`) switch the label text to a dark colour automatically.
 
 | Variable | Default | Usage |
 | --- | --- | --- |
-| `--hub-avatar-status-size` | `calc(var(--hub-avatar-size, 50px) * 0.28)` | Diameter of the status dot |
-| `--hub-avatar-status-offset` | `0px` | Inset of the dot from the bottom-end corner |
-| `--hub-avatar-status-ring-width` | `max(2px, calc(var(--hub-avatar-size, 50px) * 0.05))` | Width of the ring around the dot |
-| `--hub-avatar-status-ring-color` | `var(--hub-sys-surface-page, #fff)` | Colour of the ring around the dot |
-| `--hub-avatar-status-color` | `var(--hub-sys-text-muted, #6c757d)` | Dot colour (re-based per built-in status) |
+| `--hub-avatar-badge-size` | `calc(var(--hub-avatar-size, 50px) * 0.28)` | Dot diameter / label min-height |
+| `--hub-avatar-badge-offset` | `0px` | Inset of the badge from the bottom-end corner |
+| `--hub-avatar-badge-ring-width` | `max(2px, calc(var(--hub-avatar-size, 50px) * 0.05))` | Width of the ring around the badge |
+| `--hub-avatar-badge-ring-color` | `var(--hub-sys-surface-page, #fff)` | Colour of the ring around the badge |
+| `--hub-avatar-badge-color` | `var(--hub-sys-color-secondary, #6c757d)` | Badge fill (neutral default; semantic via `badgeColor`) |
+| `--hub-avatar-badge-text-color` | `var(--hub-ref-color-white, #fff)` | Badge label text colour |
+| `--hub-avatar-badge-font-size` | `calc(var(--hub-avatar-size, 50px) * 0.22)` | Badge label font size |
+| `--hub-avatar-badge-padding` | `calc(var(--hub-avatar-size, 50px) * 0.08)` | Badge label inline padding |
 
 ### Stacked Group
 

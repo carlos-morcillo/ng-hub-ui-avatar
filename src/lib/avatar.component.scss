@@ -36,12 +36,16 @@
   --hub-avatar-content-padding: calc(var(--hub-avatar-size, 50px) * 0.2);
   --hub-avatar-content-icon-size: calc(var(--hub-avatar-size, 50px) * 0.55);
 
-  // Presence status indicator (dot) — scales with --hub-avatar-size
-  --hub-avatar-status-size: calc(var(--hub-avatar-size, 50px) * 0.28);
-  --hub-avatar-status-offset: 0px;
-  --hub-avatar-status-ring-width: max(2px, calc(var(--hub-avatar-size, 50px) * 0.05));
-  --hub-avatar-status-ring-color: var(--hub-sys-surface-page, #fff);
-  --hub-avatar-status-color: var(--hub-sys-text-muted, #6c757d);
+  // Corner badge (a plain dot or a labelled count/text) — scales with --hub-avatar-size.
+  --hub-avatar-badge-size: calc(var(--hub-avatar-size, 50px) * 0.28);
+  --hub-avatar-badge-offset: 0px;
+  --hub-avatar-badge-ring-width: max(2px, calc(var(--hub-avatar-size, 50px) * 0.05));
+  --hub-avatar-badge-ring-color: var(--hub-sys-surface-page, #fff);
+  // Default badge fill — neutral; pick a semantic colour with the `badgeColor` input.
+  --hub-avatar-badge-color: var(--hub-sys-color-secondary, #6c757d);
+  --hub-avatar-badge-text-color: var(--hub-ref-color-white, #fff);
+  --hub-avatar-badge-font-size: calc(var(--hub-avatar-size, 50px) * 0.22);
+  --hub-avatar-badge-padding: calc(var(--hub-avatar-size, 50px) * 0.08);
 
   // Stacked group
   --hub-avatar-group-overlap: calc(var(--hub-avatar-size, 50px) * 0.3);
@@ -139,34 +143,61 @@ img.avatar-content {
   object-fit: contain;
 }
 
-// ─── Presence status indicator ───────────────────────────────────────────────
-// Opt-in dot at the bottom-end corner; the colour is re-based per built-in
-// status by the @each loop below (any custom data-status keeps the neutral
-// default unless you set --hub-avatar-status-color).
-.hub-avatar__status {
+// ─── Corner badge (dot or labelled) ──────────────────────────────────────────
+// Opt-in overlay at the bottom-end corner. A plain dot (`badge` boolean/empty) or
+// a labelled pill (`badge="4k"`). Colour it with the `badgeColor` input → the
+// @each loop below re-bases --hub-avatar-badge-color per semantic colour.
+.hub-avatar__badge {
   position: absolute;
-  inset-block-end: var(--hub-avatar-status-offset, 0px);
-  inset-inline-end: var(--hub-avatar-status-offset, 0px);
-  width: var(--hub-avatar-status-size, calc(var(--hub-avatar-size, 50px) * 0.28));
-  height: var(--hub-avatar-status-size, calc(var(--hub-avatar-size, 50px) * 0.28));
+  inset-block-end: var(--hub-avatar-badge-offset, 0px);
+  inset-inline-end: var(--hub-avatar-badge-offset, 0px);
   box-sizing: border-box;
-  border-radius: 50%;
-  background: var(--hub-avatar-status-color, var(--hub-sys-text-muted, #6c757d));
-  box-shadow: 0 0 0 var(--hub-avatar-status-ring-width, 2px)
-    var(--hub-avatar-status-ring-color, var(--hub-sys-surface-page, #fff));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--hub-avatar-badge-color, var(--hub-sys-color-secondary, #6c757d));
+  color: var(--hub-avatar-badge-text-color, var(--hub-ref-color-white, #fff));
+  box-shadow: 0 0 0 var(--hub-avatar-badge-ring-width, 2px)
+    var(--hub-avatar-badge-ring-color, var(--hub-sys-surface-page, #fff));
 }
 
-$hub-avatar-statuses: (online: success, away: warning, busy: danger);
+// Dot — a small circle, no content.
+.hub-avatar__badge--dot {
+  width: var(--hub-avatar-badge-size, calc(var(--hub-avatar-size, 50px) * 0.28));
+  height: var(--hub-avatar-badge-size, calc(var(--hub-avatar-size, 50px) * 0.28));
+  border-radius: 50%;
+}
 
-@each $name, $variant in $hub-avatar-statuses {
-  :host([data-status='#{$name}']) {
-    --hub-avatar-status-color: var(--hub-sys-color-#{$variant});
+// Label — a pill carrying text / a count.
+.hub-avatar__badge--label {
+  min-width: var(--hub-avatar-badge-size, calc(var(--hub-avatar-size, 50px) * 0.28));
+  height: var(--hub-avatar-badge-size, calc(var(--hub-avatar-size, 50px) * 0.28));
+  padding-inline: var(--hub-avatar-badge-padding, calc(var(--hub-avatar-size, 50px) * 0.08));
+  border-radius: var(--hub-sys-radius-pill, 50rem);
+  font-family: var(--hub-avatar-font-family, Helvetica, Arial, sans-serif);
+  font-size: var(--hub-avatar-badge-font-size, calc(var(--hub-avatar-size, 50px) * 0.22));
+  font-weight: var(--hub-ref-font-weight-bold, 700);
+  line-height: 1;
+}
+
+// Built-in semantic variants: badge colour (per `badgeColor`) and a coloured
+// avatar circle (per a `.hub-avatar--<name>` host class). Same loop the public
+// `hub-avatar-color-variants()` mixin runs, kept here so both work out of the box.
+$hub-avatar-semantic: primary, secondary, success, danger, warning, info, light, dark;
+
+@each $name in $hub-avatar-semantic {
+  :host([data-badge-color='#{$name}']) {
+    --hub-avatar-badge-color: var(--hub-sys-color-#{$name});
+  }
+  :host(.hub-avatar--#{$name}) {
+    --hub-avatar-bg-color: var(--hub-sys-color-#{$name});
   }
 }
 
-// offline stays neutral regardless of any themed default.
-:host([data-status='offline']) {
-  --hub-avatar-status-color: var(--hub-sys-text-muted, #6c757d);
+// Light backgrounds need dark text for legible labels.
+:host([data-badge-color='warning']),
+:host([data-badge-color='light']) {
+  --hub-avatar-badge-text-color: var(--hub-sys-text-primary, #212529);
 }
 
 // ─── Stacked group ───────────────────────────────────────────────────────────

@@ -1,27 +1,67 @@
 // ─────────────────────────────────────────────────────────────────────────
-// hub-avatar-theme — one-call theming for `<hub-avatar>`
+// ng-hub-ui-avatar — consumer SCSS helpers
 // ─────────────────────────────────────────────────────────────────────────
 //
-// Override any of the `--hub-avatar-*` design tokens in a single include. Every
-// parameter is OPTIONAL and defaults to `null`: only the parameters you pass
-// are emitted, so the rest keep the component's defaults. Token-based and
-// self-contained (no Bootstrap dependencies).
+//   @use 'ng-hub-ui-avatar/styles/mixins/avatar-theme' as avatar;
 //
-// The built-in presence statuses (online / away / busy / offline) keep their
-// semantic colours automatically; use `$status-*` here to resize / reposition
-// the dot or to colour a custom status.
+//   • hub-avatar-theme()          — override any --hub-avatar-* token in one call
+//   • hub-avatar-color-variants() — emit avatar + badge colour variants in a loop
+//   • hub-avatar-badge-color()    — set the badge colour from a single value
+//
+// Token-based and self-contained (no Bootstrap dependency).
+
+// Default semantic colour map → design-system `--hub-sys-color-*` tokens.
+// Pass your own map (or extend this one) to `hub-avatar-color-variants()`.
+$hub-avatar-semantic-colors: (
+	'primary': var(--hub-sys-color-primary),
+	'secondary': var(--hub-sys-color-secondary),
+	'success': var(--hub-sys-color-success),
+	'danger': var(--hub-sys-color-danger),
+	'warning': var(--hub-sys-color-warning),
+	'info': var(--hub-sys-color-info),
+	'light': var(--hub-sys-color-light),
+	'dark': var(--hub-sys-color-dark)
+) !default;
+
+// ── hub-avatar-color-variants ────────────────────────────────────────────────
+// In ONE loop over `$colors`, emit a coloured-circle variant of the AVATAR and a
+// coloured variant of its BADGE for every entry. The eight semantic colours
+// already work out of the box; use this to (re)emit them in your own global CSS,
+// or to register custom colours.
 //
 // @example
+//   @include avatar.hub-avatar-color-variants();                          // the 8 semantic
+//   @include avatar.hub-avatar-color-variants(('brand': var(--brand)));   // custom colour
 //
-//   @use 'ng-hub-ui-avatar/styles/mixins/avatar-theme' as *;
+//   <hub-avatar class="hub-avatar--brand">    → brand-coloured circle
+//   <hub-avatar badge badgeColor="brand">     → brand-coloured badge
+@mixin hub-avatar-color-variants($colors: $hub-avatar-semantic-colors) {
+	@each $name, $color in $colors {
+		hub-avatar.hub-avatar--#{$name} {
+			--hub-avatar-bg-color: #{$color};
+		}
+
+		hub-avatar[data-badge-color='#{$name}'] {
+			--hub-avatar-badge-color: #{$color};
+		}
+	}
+}
+
+// ── hub-avatar-badge-color ───────────────────────────────────────────────────
+// Set the badge colour from a single value (a token or a literal).
+@mixin hub-avatar-badge-color($color) {
+	--hub-avatar-badge-color: #{$color};
+}
+
+// ── hub-avatar-theme ─────────────────────────────────────────────────────────
+// Override any of the `--hub-avatar-*` design tokens in a single include. Every
+// parameter is OPTIONAL and defaults to `null`: only the parameters you pass are
+// emitted, so the rest keep the component's defaults.
 //
+// @example
 //   hub-avatar.brand {
-//     @include hub-avatar-theme(
-//       $size: 64px,
-//       $border-radius: 1rem,
-//       $bg: #ede9fe,
-//       $fg: #5b21b6,
-//       $status-ring-color: #ede9fe
+//     @include avatar.hub-avatar-theme(
+//       $size: 64px, $bg: #ede9fe, $fg: #5b21b6, $badge-color: #f43f5e
 //     );
 //   }
 //
@@ -40,12 +80,18 @@
 	$font-weight: null,
 	$font-size: null,
 	$text-transform: null,
-	// ── Presence status dot ──
-	$status-size: null,
-	$status-offset: null,
-	$status-ring-width: null,
-	$status-ring-color: null,
-	$status-color: null,
+	// ── Projected custom content ──
+	$content-padding: null,
+	$content-icon-size: null,
+	// ── Corner badge (dot / labelled) ──
+	$badge-size: null,
+	$badge-offset: null,
+	$badge-ring-width: null,
+	$badge-ring-color: null,
+	$badge-color: null,
+	$badge-text-color: null,
+	$badge-font-size: null,
+	$badge-padding: null,
 	// ── Stacked group ──
 	$group-overlap: null,
 	$group-ring-width: null,
@@ -88,21 +134,38 @@
 		--hub-avatar-text-transform: #{$text-transform};
 	}
 
-	// Presence status dot
-	@if $status-size != null {
-		--hub-avatar-status-size: #{$status-size};
+	// Projected custom content
+	@if $content-padding != null {
+		--hub-avatar-content-padding: #{$content-padding};
 	}
-	@if $status-offset != null {
-		--hub-avatar-status-offset: #{$status-offset};
+	@if $content-icon-size != null {
+		--hub-avatar-content-icon-size: #{$content-icon-size};
 	}
-	@if $status-ring-width != null {
-		--hub-avatar-status-ring-width: #{$status-ring-width};
+
+	// Corner badge
+	@if $badge-size != null {
+		--hub-avatar-badge-size: #{$badge-size};
 	}
-	@if $status-ring-color != null {
-		--hub-avatar-status-ring-color: #{$status-ring-color};
+	@if $badge-offset != null {
+		--hub-avatar-badge-offset: #{$badge-offset};
 	}
-	@if $status-color != null {
-		--hub-avatar-status-color: #{$status-color};
+	@if $badge-ring-width != null {
+		--hub-avatar-badge-ring-width: #{$badge-ring-width};
+	}
+	@if $badge-ring-color != null {
+		--hub-avatar-badge-ring-color: #{$badge-ring-color};
+	}
+	@if $badge-color != null {
+		--hub-avatar-badge-color: #{$badge-color};
+	}
+	@if $badge-text-color != null {
+		--hub-avatar-badge-text-color: #{$badge-text-color};
+	}
+	@if $badge-font-size != null {
+		--hub-avatar-badge-font-size: #{$badge-font-size};
+	}
+	@if $badge-padding != null {
+		--hub-avatar-badge-padding: #{$badge-padding};
 	}
 
 	// Stacked group

@@ -2,6 +2,28 @@
 
 This document details the breaking changes introduced in major versions of `ng-hub-ui-avatar` and how to migrate your codebase.
 
+## Version 22.3.0
+
+### `status` input replaced by a general `badge`
+
+The presence-only `status` input has been replaced by a more general **`badge`** overlay that can be a plain dot **or** carry a label (count / text), coloured by a **semantic** `badgeColor`.
+
+| Before (`status`) | After (`badge` + `badgeColor`) |
+| ----------------- | ------------------------------ |
+| `status="online"` | `badge badgeColor="success"` |
+| `status="away"` | `badge badgeColor="warning"` |
+| `status="busy"` | `badge badgeColor="danger"` |
+| `status="offline"` | `badge badgeColor="secondary"` |
+| `status="custom"` + `--hub-avatar-status-color` | `badge badgeColor="<semantic>"` (or `--hub-avatar-badge-color`) |
+
+New: a **labelled** badge — `<hub-avatar badge="4k" badgeColor="danger">`.
+
+Renames:
+
+- Type `HubAvatarStatus` → `HubAvatarBadgeColor` (now the semantic colour set, not presence keywords).
+- Tokens `--hub-avatar-status-{size,offset,ring-width,ring-color,color}` → `--hub-avatar-badge-{size,offset,ring-width,ring-color,color}`.
+- `hub-avatar-theme()` parameters `$status-*` → `$badge-*`.
+
 ## Version 21.1.0
 
 ### Removal of Public SCSS Entry Point

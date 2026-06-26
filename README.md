@@ -254,9 +254,10 @@ export class AppModule {}
 | `style`          | `Record<string, any> \| string` | `{}`        | Custom inline styles merged into avatar styles |
 | `placeholder`    | `string`                        | `undefined` | Reserved placeholder input                     |
 | `referrerpolicy` | `string \| null`                | `undefined` | Referrer policy for avatar image requests      |
-| `status`         | `HubAvatarStatus \| string \| null` | `null`  | Presence indicator dot at the bottom-end corner. Built-ins: `online` (success), `away` (warning), `busy` (danger), `offline` (neutral). Any custom string is accepted — set `--hub-avatar-status-color` to colour it. When `null` (default) no dot is rendered. |
+| `badge`          | `string \| number \| boolean \| null` | `null` | Corner overlay. `badge` / `[badge]="true"` → a **dot**; `badge="4k"` / `[badge]="9"` → a **labelled** pill; `null` / absent → nothing. |
+| `badgeColor`     | `HubAvatarBadgeColor \| string \| null` | `null` | Semantic colour of the badge: `primary · secondary · success · danger · warning · info · light · dark` (→ `--hub-sys-color-*`). Any custom string also works (set `--hub-avatar-badge-color`). |
 
-`HubAvatarStatus` is an exported type covering the built-in statuses: `'online' | 'away' | 'busy' | 'offline'`.
+`HubAvatarBadgeColor` is an exported type covering the semantic colours: `'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark'`. Express presence with the colour: online → `success`, away → `warning`, busy → `danger`, offline → `secondary`.
 
 ### Outputs
 
@@ -318,33 +319,58 @@ hub-avatar {
 }
 ```
 
-### Presence status
+### Badge (dot or labelled)
 
-Set the `status` input to render a small dot at the bottom-end corner. The dot scales with the avatar (the component exposes the live size on the host as `--hub-avatar-size`).
+The `badge` input renders a corner overlay — a plain **dot** (great for presence) or a **labelled** pill (a count / text). Colour it with the semantic `badgeColor` input. Everything scales with the avatar.
 
 ```html
-<hub-avatar name="John Doe" status="online"></hub-avatar>
-<hub-avatar name="Jane Doe" status="busy"></hub-avatar>
-<hub-avatar name="Custom" status="dnd"></hub-avatar>
+<!-- presence dot: badge (no content) + a semantic colour -->
+<hub-avatar name="Ada Lovelace" badge badgeColor="success"></hub-avatar>   <!-- online -->
+<hub-avatar name="Grace Hopper" badge badgeColor="warning"></hub-avatar>   <!-- away -->
+<hub-avatar name="Alan Turing" badge badgeColor="danger"></hub-avatar>     <!-- busy -->
+<hub-avatar name="Linus T" badge badgeColor="secondary"></hub-avatar>      <!-- offline -->
+
+<!-- labelled badge -->
+<hub-avatar name="Carlos M" badge="4k" badgeColor="danger"></hub-avatar>
 ```
 
-Built-ins map to the design-system colours: `online` → success, `away` → warning, `busy` → danger, `offline` → neutral. Any custom string is accepted; colour it with `--hub-avatar-status-color`:
+`badgeColor` maps to `--hub-sys-color-*`. For a custom colour, set `--hub-avatar-badge-color` (per element or via the [colour-variants mixin](#colour-variants--mixins)):
 
 ```scss
-hub-avatar[data-status='dnd'] {
-	--hub-avatar-status-color: #9333ea;
+hub-avatar[data-badge-color='brand'] {
+	--hub-avatar-badge-color: #9333ea;
 }
 ```
 
-Status tokens:
+Badge tokens:
 
-| Variable                        | Default                                                        | Usage                                  |
-| ------------------------------- | ------------------------------------------------------------- | -------------------------------------- |
-| `--hub-avatar-status-size`      | `calc(var(--hub-avatar-size, 50px) * 0.28)`                   | Diameter of the status dot             |
-| `--hub-avatar-status-offset`    | `0px`                                                         | Inset of the dot from the corner       |
-| `--hub-avatar-status-ring-width`| `max(2px, calc(var(--hub-avatar-size, 50px) * 0.05))`        | Width of the ring around the dot       |
-| `--hub-avatar-status-ring-color`| `var(--hub-sys-surface-page, #fff)`                          | Colour of the ring around the dot      |
-| `--hub-avatar-status-color`     | `var(--hub-sys-text-muted, #6c757d)`                         | Dot colour (re-based per built-in status) |
+| Variable                          | Default                                               | Usage                                  |
+| --------------------------------- | ----------------------------------------------------- | -------------------------------------- |
+| `--hub-avatar-badge-size`         | `calc(var(--hub-avatar-size, 50px) * 0.28)`           | Dot diameter / label min-height        |
+| `--hub-avatar-badge-offset`       | `0px`                                                 | Inset from the bottom-end corner       |
+| `--hub-avatar-badge-ring-width`   | `max(2px, calc(var(--hub-avatar-size, 50px) * 0.05))` | Width of the ring around the badge     |
+| `--hub-avatar-badge-ring-color`   | `var(--hub-sys-surface-page, #fff)`                   | Colour of the ring around the badge    |
+| `--hub-avatar-badge-color`        | `var(--hub-sys-color-secondary, #6c757d)`             | Badge fill (semantic via `badgeColor`) |
+| `--hub-avatar-badge-text-color`   | `var(--hub-ref-color-white, #fff)`                    | Badge label text colour                |
+| `--hub-avatar-badge-font-size`    | `calc(var(--hub-avatar-size, 50px) * 0.22)`           | Badge label font size                  |
+| `--hub-avatar-badge-padding`      | `calc(var(--hub-avatar-size, 50px) * 0.08)`           | Badge label inline padding             |
+
+### Colour variants & mixins
+
+Every semantic colour works out of the box, both for the badge (`badgeColor="success"`) and as a coloured **avatar circle** (`class="hub-avatar--success"`). To (re)generate these in your own CSS — or to register a **custom colour** (e.g. a brand colour) — use the `hub-avatar-color-variants()` mixin, which emits the avatar **and** badge variants in one loop over a colour map:
+
+```scss
+@use 'ng-hub-ui-avatar/styles/mixins/avatar-theme' as avatar;
+
+// the eight semantic colours (default)
+@include avatar.hub-avatar-color-variants();
+
+// add your own — generates <hub-avatar class="hub-avatar--brand"> and badgeColor="brand"
+@include avatar.hub-avatar-color-variants((
+	'brand': var(--my-brand),
+	'accent': #00d4aa
+));
+```
 
 ### Avatar group
 
@@ -368,18 +394,18 @@ Group tokens:
 
 ### Sass theming mixin
 
-The `hub-avatar-theme()` mixin themes an avatar in a single include — shape/surface, initials typography, the status dot and the group ring. Every parameter is optional and defaults to `null`, so only the ones you pass are emitted as `--hub-avatar-*` overrides. It is token-based, with no Bootstrap dependency.
+The `hub-avatar-theme()` mixin themes an avatar in a single include — shape/surface, initials typography, projected-content sizing, the badge and the group ring. Every parameter is optional and defaults to `null`, so only the ones you pass are emitted as `--hub-avatar-*` overrides. It is token-based, with no Bootstrap dependency.
 
 ```scss
-@use 'ng-hub-ui-avatar/styles/mixins/avatar-theme' as *;
+@use 'ng-hub-ui-avatar/styles/mixins/avatar-theme' as avatar;
 
 hub-avatar.brand {
-	@include hub-avatar-theme(
+	@include avatar.hub-avatar-theme(
 		$size: 64px,
 		$border-radius: 1rem,
 		$bg: #ede9fe,
 		$fg: #5b21b6,
-		$status-ring-color: #ede9fe
+		$badge-color: #f43f5e
 	);
 }
 ```

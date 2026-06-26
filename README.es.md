@@ -254,9 +254,10 @@ Valores del enum `AvatarSource`: `FACEBOOK`, `GRAVATAR`, `GITHUB`, `CUSTOM`, `IN
 | `style`          | `Record<string, any> \| string` | `{}`        | Estilos en línea combinados con los del avatar    |
 | `placeholder`    | `string`                        | `undefined` | Input de placeholder reservado                    |
 | `referrerpolicy` | `string \| null`                | `undefined` | Política de referrer para las peticiones de imagen |
-| `status`         | `HubAvatarStatus \| string \| null` | `null`  | Punto indicador de presencia en la esquina inferior. Predefinidos: `online` (success), `away` (warning), `busy` (danger), `offline` (neutral). Se acepta cualquier cadena personalizada — usa `--hub-avatar-status-color` para colorearla. Cuando es `null` (por defecto) no se muestra ningún punto. |
+| `badge`          | `string \| number \| boolean \| null` | `null` | Superposición en la esquina. `badge` / `[badge]="true"` → **punto**; `badge="4k"` / `[badge]="9"` → **etiqueta** (pill); `null` / ausente → nada. |
+| `badgeColor`     | `HubAvatarBadgeColor \| string \| null` | `null` | Color **semántico** del badge: `primary · secondary · success · danger · warning · info · light · dark` (→ `--hub-sys-color-*`). También acepta cualquier cadena (usa `--hub-avatar-badge-color`). |
 
-`HubAvatarStatus` es un tipo exportado que cubre los estados predefinidos: `'online' | 'away' | 'busy' | 'offline'`.
+`HubAvatarBadgeColor` es un tipo exportado con los colores semánticos: `'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark'`. La presencia se expresa con el color: online → `success`, away → `warning`, busy → `danger`, offline → `secondary`.
 
 ### Outputs
 
@@ -318,33 +319,58 @@ hub-avatar {
 }
 ```
 
-### Estado de presencia
+### Badge (punto o etiqueta)
 
-Asigna el input `status` para mostrar un pequeño punto en la esquina inferior. El punto escala con el avatar (el componente expone el tamaño actual en el host como `--hub-avatar-size`).
+El input `badge` muestra una superposición en la esquina — un **punto** (ideal para presencia) o una **etiqueta** (pill) con un contador / texto. Coloréalo con el input semántico `badgeColor`. Todo escala con el avatar.
 
 ```html
-<hub-avatar name="John Doe" status="online"></hub-avatar>
-<hub-avatar name="Jane Doe" status="busy"></hub-avatar>
-<hub-avatar name="Custom" status="dnd"></hub-avatar>
+<!-- punto de presencia: badge (sin contenido) + color semántico -->
+<hub-avatar name="Ada Lovelace" badge badgeColor="success"></hub-avatar>   <!-- online -->
+<hub-avatar name="Grace Hopper" badge badgeColor="warning"></hub-avatar>   <!-- away -->
+<hub-avatar name="Alan Turing" badge badgeColor="danger"></hub-avatar>     <!-- busy -->
+<hub-avatar name="Linus T" badge badgeColor="secondary"></hub-avatar>      <!-- offline -->
+
+<!-- badge con etiqueta -->
+<hub-avatar name="Carlos M" badge="4k" badgeColor="danger"></hub-avatar>
 ```
 
-Los predefinidos se asignan a los colores del sistema de diseño: `online` → success, `away` → warning, `busy` → danger, `offline` → neutral. Se acepta cualquier cadena personalizada; coloréala con `--hub-avatar-status-color`:
+`badgeColor` mapea a `--hub-sys-color-*`. Para un color custom, usa `--hub-avatar-badge-color` (por elemento o con el [mixin de variantes](#variantes-de-color--mixins)):
 
 ```scss
-hub-avatar[data-status='dnd'] {
-	--hub-avatar-status-color: #9333ea;
+hub-avatar[data-badge-color='brand'] {
+	--hub-avatar-badge-color: #9333ea;
 }
 ```
 
-Tokens de estado:
+Tokens del badge:
 
-| Variable                        | Por defecto                                                   | Uso                                       |
-| ------------------------------- | ------------------------------------------------------------- | ----------------------------------------- |
-| `--hub-avatar-status-size`      | `calc(var(--hub-avatar-size, 50px) * 0.28)`                   | Diámetro del punto de estado              |
-| `--hub-avatar-status-offset`    | `0px`                                                         | Separación del punto respecto a la esquina |
-| `--hub-avatar-status-ring-width`| `max(2px, calc(var(--hub-avatar-size, 50px) * 0.05))`        | Ancho del anillo alrededor del punto      |
-| `--hub-avatar-status-ring-color`| `var(--hub-sys-surface-page, #fff)`                          | Color del anillo alrededor del punto      |
-| `--hub-avatar-status-color`     | `var(--hub-sys-text-muted, #6c757d)`                         | Color del punto (recalculado por estado predefinido) |
+| Variable                          | Por defecto                                           | Uso                                    |
+| --------------------------------- | ----------------------------------------------------- | -------------------------------------- |
+| `--hub-avatar-badge-size`         | `calc(var(--hub-avatar-size, 50px) * 0.28)`           | Diámetro del punto / alto mín. etiqueta |
+| `--hub-avatar-badge-offset`       | `0px`                                                 | Separación respecto a la esquina       |
+| `--hub-avatar-badge-ring-width`   | `max(2px, calc(var(--hub-avatar-size, 50px) * 0.05))` | Ancho del anillo del badge             |
+| `--hub-avatar-badge-ring-color`   | `var(--hub-sys-surface-page, #fff)`                   | Color del anillo del badge             |
+| `--hub-avatar-badge-color`        | `var(--hub-sys-color-secondary, #6c757d)`             | Relleno del badge (semántico por `badgeColor`) |
+| `--hub-avatar-badge-text-color`   | `var(--hub-ref-color-white, #fff)`                    | Color del texto de la etiqueta         |
+| `--hub-avatar-badge-font-size`    | `calc(var(--hub-avatar-size, 50px) * 0.22)`           | Tamaño de fuente de la etiqueta        |
+| `--hub-avatar-badge-padding`      | `calc(var(--hub-avatar-size, 50px) * 0.08)`           | Padding horizontal de la etiqueta      |
+
+### Variantes de color & mixins
+
+Cada color semántico funciona de fábrica, tanto para el badge (`badgeColor="success"`) como para un **círculo de avatar** de color (`class="hub-avatar--success"`). Para (re)generarlos en tu CSS — o registrar un **color custom** (p. ej. tu marca) — usa el mixin `hub-avatar-color-variants()`, que emite las variantes de avatar **y** badge en un solo bucle sobre un mapa de colores:
+
+```scss
+@use 'ng-hub-ui-avatar/styles/mixins/avatar-theme' as avatar;
+
+// los ocho colores semánticos (por defecto)
+@include avatar.hub-avatar-color-variants();
+
+// añade los tuyos — genera <hub-avatar class="hub-avatar--brand"> y badgeColor="brand"
+@include avatar.hub-avatar-color-variants((
+	'brand': var(--my-brand),
+	'accent': #00d4aa
+));
+```
 
 ### Grupo de avatares
 
@@ -368,18 +394,18 @@ Tokens de grupo:
 
 ### Mixin de tematización Sass
 
-El mixin `hub-avatar-theme()` tematiza un avatar en una sola llamada — forma/superficie, tipografía de las iniciales, el punto de estado y el anillo del grupo. Cada parámetro es opcional y por defecto es `null`, así que solo se emiten como sobrescrituras `--hub-avatar-*` los que pasas. Está basado en tokens, sin dependencia de Bootstrap.
+El mixin `hub-avatar-theme()` tematiza un avatar en una sola llamada — forma/superficie, tipografía de las iniciales, el tamaño del contenido proyectado, el badge y el anillo del grupo. Cada parámetro es opcional y por defecto es `null`, así que solo se emiten como sobrescrituras `--hub-avatar-*` los que pasas. Está basado en tokens, sin dependencia de Bootstrap.
 
 ```scss
-@use 'ng-hub-ui-avatar/styles/mixins/avatar-theme' as *;
+@use 'ng-hub-ui-avatar/styles/mixins/avatar-theme' as avatar;
 
 hub-avatar.brand {
-	@include hub-avatar-theme(
+	@include avatar.hub-avatar-theme(
 		$size: 64px,
 		$border-radius: 1rem,
 		$bg: #ede9fe,
 		$fg: #5b21b6,
-		$status-ring-color: #ede9fe
+		$badge-color: #f43f5e
 	);
 }
 ```

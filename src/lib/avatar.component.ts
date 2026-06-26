@@ -1,4 +1,4 @@
-import { AfterContentInit, Component, ElementRef, OnChanges, OnDestroy, SecurityContext, SimpleChanges, ViewChild, input, output } from '@angular/core';
+import { AfterContentInit, Component, ElementRef, OnChanges, OnDestroy, SecurityContext, SimpleChanges, ViewChild, computed, input, output } from '@angular/core';
 
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { map, takeWhile } from 'rxjs/operators';
@@ -12,10 +12,12 @@ type StyleObject = Record<string, string | number | null | undefined>;
 type Style = StyleObject | string;
 
 /**
- * Built-in semantic presence statuses for the avatar indicator dot.
- * `online` → success · `away` → warning · `busy` → danger · `offline` → neutral.
+ * Semantic colours for the avatar badge and the avatar colour variants. Each maps
+ * to a design-system `--hub-sys-color-*` token. Use them to colour a presence dot
+ * (e.g. `success` = online, `warning` = away, `danger` = busy, `secondary` = offline)
+ * or a labelled badge. Any custom string is also accepted (set `--hub-avatar-badge-color`).
  */
-export type HubAvatarStatus = 'online' | 'away' | 'busy' | 'offline';
+export type HubAvatarBadgeColor = 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark';
 
 /**
  * Universal avatar component that
@@ -56,12 +58,18 @@ export type HubAvatarStatus = 'online' | 'away' | 'busy' | 'offline';
 				}
 			}
 		</div>
-		@if (status()) {
-			<span class="hub-avatar__status" aria-hidden="true"></span>
+		@if (_hasBadge()) {
+			<span
+				class="hub-avatar__badge"
+				[class.hub-avatar__badge--dot]="_isDot()"
+				[class.hub-avatar__badge--label]="!_isDot()"
+				[attr.aria-hidden]="_isDot() ? 'true' : null"
+				>{{ _badgeText() }}</span
+			>
 		}
 	`,
 	host: {
-		'[attr.data-status]': 'status() || null',
+		'[attr.data-badge-color]': 'badgeColor() || null',
 		'[style.--hub-avatar-size]': 'avatarSizePx'
 	}
 })
@@ -85,12 +93,39 @@ export class AvatarComponent implements AfterContentInit, OnChanges, OnDestroy {
 	readonly placeholder = input<string>();
 	readonly initialsSize = input<string | number>(0);
 	/**
-	 * Semantic presence indicator shown as a small dot at the bottom-end corner.
-	 * Built-ins: `online` (success) · `away` (warning) · `busy` (danger) · `offline`
-	 * (neutral). Any custom string is accepted — set `--hub-avatar-status-color`
-	 * to colour it. When unset (default) no dot is rendered.
+	 * Overlay badge at the bottom-end corner. A boolean / empty value renders a plain
+	 * dot (great for a presence indicator); a string or number renders a labelled badge
+	 * (e.g. a count like `"4k"`). `null` / absent (default) renders nothing.
+	 *
+	 * @example <hub-avatar badge badgeColor="success" />      // dot
+	 * @example <hub-avatar badge="4k" badgeColor="danger" />  // labelled
 	 */
-	readonly status = input<HubAvatarStatus | (string & {}) | null>(null);
+	readonly badge = input<string | number | boolean | null>(null);
+
+	/**
+	 * Semantic colour of the {@link badge} (and, as a host class, of the avatar itself).
+	 * Maps to a `--hub-sys-color-*` token; any custom string also works (set
+	 * `--hub-avatar-badge-color`). When unset the badge uses a neutral default.
+	 */
+	readonly badgeColor = input<HubAvatarBadgeColor | (string & {}) | null>(null);
+
+	/** True when a badge should be rendered (the `badge` input is set to anything but `null` / `false`). */
+	protected readonly _hasBadge = computed(() => {
+		const b = this.badge();
+		return b !== null && b !== undefined && b !== false;
+	});
+
+	/** The badge's text content; empty for a plain dot (`badge` is `true` or an empty string). */
+	protected readonly _badgeText = computed(() => {
+		const b = this.badge();
+		if (b === true || b === '' || b === null || b === undefined || b === false) {
+			return '';
+		}
+		return String(b);
+	});
+
+	/** True when the badge is a plain dot (shown, but with no text content). */
+	protected readonly _isDot = computed(() => this._hasBadge() && this._badgeText() === '');
 
 	readonly clickOnAvatar = output<Source>();
 
