@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.2.1] - 2026-06-26
+
+### Fixed
+
+- Corrected the Angular peer dependency range from `>=16.0.0` to `>=18.0.0`. The library uses `input()` (Angular 17.1), `output()` (17.3) and the `@if` control flow (17), so it never actually worked on Angular 16 / 17.0–17.2 — the declared range now reflects the real minimum.
+- Declared `ts-md5` (used by the Gravatar source) and `tslib` as runtime `dependencies`. Previously `ts-md5` was not declared at all (only listed under `allowedNonPeerDependencies`), so consumers using the Gravatar source could hit a missing-module error, and `tslib` was a peer dependency. Both now install automatically with the package.
+
 ## [22.2.0] - 2026-06-26
 
 ### Added
