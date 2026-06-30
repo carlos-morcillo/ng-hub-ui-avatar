@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.5.0] - 2026-06-30
+
+### Added
+
+- **Standalone `AvatarComponent`.** `<hub-avatar>` is now a standalone component (`standalone: true`) — import it directly with `imports: [AvatarComponent]`, no `NgModule` required. Aligns the library with the rest of the ng-hub-ui ecosystem and modern Angular.
+- **`provideAvatar(config?)`** — a standalone-friendly environment provider that replaces `AvatarModule.forRoot()` for configuring source priority, colour palette and src-cache behaviour. Optional: the component works with sensible defaults out of the box.
+
+### Changed
+
+- `AvatarModule` is now a thin re-export of the standalone `AvatarComponent` (it no longer declares it). Existing `imports: [AvatarModule]` and `AvatarModule.forRoot(config)` usages keep working unchanged.
+
+### Deprecated
+
+- **`AvatarModule`** and **`AvatarModule.forRoot()`** — prefer importing `AvatarComponent` and registering `provideAvatar()`. The module remains for backward compatibility and will be removed in a future major version.
+
 ## [22.4.0] - 2026-06-26
 
 ### Changed

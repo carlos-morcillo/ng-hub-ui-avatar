@@ -31,7 +31,7 @@ export type HubAvatarBadgeColor = 'primary' | 'secondary' | 'success' | 'danger'
 @Component({
 	// tslint:disable-next-line:component-selector
 	selector: 'hub-avatar',
-	standalone: false,
+	standalone: true,
 	styleUrl: './avatar.component.scss',
 	template: `
 		<div (click)="onAvatarClicked()" class="avatar-container" [class.hub-avatar--custom]="hasCustomContent" [style]="hostStyle">

@@ -86,7 +86,7 @@ Fallback uses a source priority order. By default, the component tries the suppo
 - **Flexible Shape**: Round or square avatars with configurable corner radius and border.
 - **CSS Variables**: Full theming via canonical `--hub-avatar-*` custom properties.
 - **Signals API**: Modern Angular inputs/outputs built on signals.
-- **Module Configuration**: Customize colors, source priority order and cache behavior via `AvatarModule.forRoot()`.
+- **Standalone-first**: `<hub-avatar>` is a standalone component — import it directly, no `NgModule` required. Customize colors, source priority order and cache behavior via `provideAvatar()`.
 
 ## Installation
 
@@ -97,59 +97,67 @@ npm install ng-hub-ui-avatar
 ## Quick Start
 
 ```typescript
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { bootstrapApplication } from '@angular/platform-browser';
 import { provideHttpClient } from '@angular/common/http';
-import { AvatarModule } from 'ng-hub-ui-avatar';
+import { provideAvatar } from 'ng-hub-ui-avatar';
 import { AppComponent } from './app.component';
 
-@NgModule({
-	declarations: [AppComponent],
-	imports: [BrowserModule, AvatarModule],
-	providers: [provideHttpClient()],
-	bootstrap: [AppComponent]
-})
-export class AppModule {}
+bootstrapApplication(AppComponent, {
+	providers: [
+		provideHttpClient(), // required for async remote sources (Gravatar, GitHub…)
+		provideAvatar() // optional — pass a config to customise sources/colours/cache
+	]
+});
 ```
 
-> `HttpClient` is required for async remote sources (for example Gravatar or GitHub). For standalone bootstrap apps, add `provideHttpClient()` to your application providers and import `AvatarModule` in the components that use `<hub-avatar>`.
-
-Then use the component in any template:
-
-```html
-<hub-avatar name="John Doe"></hub-avatar>
-```
-
-## Usage
-
-`ng-hub-ui-avatar` is distributed as an Angular module. The `<hub-avatar>` component is declared and exported by `AvatarModule`.
-
-### Module-based apps
-
-```typescript
-import { AvatarModule } from 'ng-hub-ui-avatar';
-
-@NgModule({
-	imports: [AvatarModule]
-})
-export class FeatureModule {}
-```
-
-### Standalone components
-
-Because the component is provided by a module, import `AvatarModule` directly in the `imports` array of your standalone component:
+Then import the standalone component and use it in any template:
 
 ```typescript
 import { Component } from '@angular/core';
-import { AvatarModule } from 'ng-hub-ui-avatar';
+import { AvatarComponent } from 'ng-hub-ui-avatar';
 
 @Component({
 	selector: 'app-profile',
 	standalone: true,
-	imports: [AvatarModule],
+	imports: [AvatarComponent],
 	template: `<hub-avatar name="John Doe" [round]="true" size="64"></hub-avatar>`
 })
 export class ProfileComponent {}
+```
+
+> `provideAvatar()` is optional — `<hub-avatar>` works out of the box with defaults. `HttpClient` is only needed for async remote sources (Gravatar, GitHub).
+
+## Usage
+
+`<hub-avatar>` is a **standalone** component: import `AvatarComponent` directly into the `imports` of any standalone component (as shown above). No `NgModule` is required.
+
+### Configuration
+
+Customise source priority, colour palette or src-cache behaviour with `provideAvatar()`:
+
+```typescript
+import { provideAvatar } from 'ng-hub-ui-avatar';
+import { AvatarSource } from 'ng-hub-ui-avatar';
+
+providers: [
+	provideAvatar({
+		sourcePriorityOrder: [AvatarSource.CUSTOM, AvatarSource.GRAVATAR, AvatarSource.INITIALS],
+		colors: ['#1abc9c', '#3498db', '#9b59b6']
+	})
+];
+```
+
+### Legacy `NgModule` (deprecated)
+
+`AvatarModule` is still exported for backward compatibility and now simply re-exports the standalone component. It is **deprecated** — prefer importing `AvatarComponent` and using `provideAvatar()`.
+
+```typescript
+import { AvatarModule } from 'ng-hub-ui-avatar'; // deprecated
+
+@NgModule({
+	imports: [AvatarModule] // AvatarModule.forRoot(config) still works too
+})
+export class FeatureModule {}
 ```
 
 ### Examples

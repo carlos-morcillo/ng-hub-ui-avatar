@@ -86,7 +86,7 @@ La reserva utiliza un orden de prioridad de fuentes. Por defecto, el componente 
 - **Forma flexible**: avatares redondos o cuadrados con radio de esquina y borde configurables.
 - **Variables CSS**: tematización completa mediante las propiedades personalizadas canónicas `--hub-avatar-*`.
 - **API de signals**: inputs/outputs modernos de Angular basados en signals.
-- **Configuración de módulo**: personaliza colores, orden de prioridad de fuentes y comportamiento de caché mediante `AvatarModule.forRoot()`.
+- **Standalone primero**: `<hub-avatar>` es un componente standalone — impórtalo directamente, sin `NgModule`. Personaliza colores, orden de prioridad de fuentes y caché con `provideAvatar()`.
 
 ## Instalación
 
@@ -97,56 +97,50 @@ npm install ng-hub-ui-avatar
 ## Inicio rápido
 
 ```typescript
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { bootstrapApplication } from '@angular/platform-browser';
 import { provideHttpClient } from '@angular/common/http';
-import { AvatarModule } from 'ng-hub-ui-avatar';
+import { provideAvatar } from 'ng-hub-ui-avatar';
 import { AppComponent } from './app.component';
 
-@NgModule({
-	declarations: [AppComponent],
-	imports: [BrowserModule, AvatarModule],
-	providers: [provideHttpClient()],
-	bootstrap: [AppComponent]
-})
-export class AppModule {}
+bootstrapApplication(AppComponent, {
+	providers: [
+		provideHttpClient(), // necesario para fuentes remotas asíncronas (Gravatar, GitHub…)
+		provideAvatar() // opcional — pásale una config para personalizar fuentes/colores/caché
+	]
+});
 ```
 
-> `HttpClient` es necesario para las fuentes remotas asíncronas (por ejemplo Gravatar o GitHub). En aplicaciones con arranque standalone, añade `provideHttpClient()` a los providers de tu aplicación e importa `AvatarModule` en los componentes que usen `<hub-avatar>`.
-
-Luego usa el componente en cualquier plantilla:
-
-```html
-<hub-avatar name="John Doe"></hub-avatar>
-```
-
-## Uso
-
-`ng-hub-ui-avatar` se distribuye como un módulo de Angular. El componente `<hub-avatar>` está declarado y exportado por `AvatarModule`.
-
-### Aplicaciones basadas en módulos
-
-```typescript
-import { AvatarModule } from 'ng-hub-ui-avatar';
-
-@NgModule({
-	imports: [AvatarModule]
-})
-export class FeatureModule {}
-```
-
-### Componentes standalone
-
-Como el componente lo proporciona un módulo, importa `AvatarModule` directamente en el array `imports` de tu componente standalone:
+Luego importa el componente standalone y úsalo en cualquier plantilla:
 
 ```typescript
 import { Component } from '@angular/core';
-import { AvatarModule } from 'ng-hub-ui-avatar';
+import { AvatarComponent } from 'ng-hub-ui-avatar';
 
 @Component({
 	selector: 'app-profile',
 	standalone: true,
-	imports: [AvatarModule],
+	imports: [AvatarComponent],
+	template: `<hub-avatar name="John Doe" [round]="true" size="64"></hub-avatar>`
+})
+export class ProfileComponent {}
+```
+
+> `provideAvatar()` es opcional — `<hub-avatar>` funciona con valores por defecto. `HttpClient` solo hace falta para fuentes remotas asíncronas (Gravatar, GitHub).
+
+## Uso
+
+`<hub-avatar>` es un componente **standalone**: importa `AvatarComponent` directamente en el `imports` de cualquier componente standalone (como arriba). No hace falta ningún `NgModule`.
+
+### Componentes standalone
+
+```typescript
+import { Component } from '@angular/core';
+import { AvatarComponent } from 'ng-hub-ui-avatar';
+
+@Component({
+	selector: 'app-profile',
+	standalone: true,
+	imports: [AvatarComponent],
 	template: `<hub-avatar name="John Doe" [round]="true" size="64"></hub-avatar>`
 })
 export class ProfileComponent {}
@@ -196,27 +190,25 @@ Proyecta cualquier contenido directamente dentro de `<hub-avatar>` — un icono 
 
 Se activa automáticamente cuando proyectas contenido y tiene prioridad sobre las fuentes de imagen/iniciales. El círculo usa el fondo propio del avatar (`--hub-avatar-bg-color`, el color de acento por defecto) con un primer plano blanco, así que se ve como un círculo de color sin configurar nada. Tematízalo con los inputs habituales `bgColor` / `fgColor` / `borderColor`, y ajusta el tamaño con los tokens `--hub-avatar-content-*` (ver [Estilos](#estilos)).
 
-### Configuración del módulo (`forRoot`)
+### Configuración (`provideAvatar`)
 
-`AvatarModule.forRoot()` permite sobrescribir el comportamiento a nivel de módulo.
+`provideAvatar()` permite personalizar el comportamiento en aplicaciones standalone (reemplazo de `AvatarModule.forRoot()`).
 
 ```typescript
-import { AvatarModule, AvatarSource } from 'ng-hub-ui-avatar';
+import { provideAvatar, AvatarSource } from 'ng-hub-ui-avatar';
 
-const avatarSourcesOrder = [AvatarSource.CUSTOM, AvatarSource.INITIALS];
-const avatarColors = ['#FFB6C1', '#2c3e50', '#95a5a6', '#f39c12', '#1abc9c'];
-
-@NgModule({
-	imports: [
-		AvatarModule.forRoot({
-			sourcePriorityOrder: avatarSourcesOrder,
-			colors: avatarColors,
+bootstrapApplication(AppComponent, {
+	providers: [
+		provideAvatar({
+			sourcePriorityOrder: [AvatarSource.CUSTOM, AvatarSource.INITIALS],
+			colors: ['#FFB6C1', '#2c3e50', '#95a5a6', '#f39c12', '#1abc9c'],
 			disableSrcCache: false
 		})
 	]
-})
-export class AppModule {}
+});
 ```
+
+> **`NgModule` heredado (deprecado):** `AvatarModule` se sigue exportando por compatibilidad y solo reexporta el componente standalone. Está **deprecado** — usa `AvatarComponent` + `provideAvatar()`. `AvatarModule.forRoot(config)` también sigue funcionando.
 
 Campos de `AvatarConfig`:
 
