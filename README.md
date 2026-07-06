@@ -291,7 +291,7 @@ Framework-agnostic customization example:
 
 ```scss
 hub-avatar {
-	--hub-avatar-size: 64px;
+	/* size is set via the [size] input, not a CSS variable */
 	--hub-avatar-border-radius: 16px;
 	--hub-avatar-fg-color: #ffffff;
 	--hub-avatar-bg-color: #0d6efd;

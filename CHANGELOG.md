@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.5.1] - 2026-07-02
+
+### Fixed
+
+- CSS variable fallbacks realigned to the ds light defaults (`--hub-ref-font-family-base`: `Helvetica, Arial, sans-serif` → `system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif`); fallbacks only apply when ng-hub-ui-ds is not loaded.
+- **Initials avatar honours `--hub-avatar-font-family`.** The initials text no longer pins `Helvetica, Arial, sans-serif` through an inline `font` shorthand (which shadowed the token); only the size is set inline, so the family follows `.avatar-content`'s `--hub-avatar-font-family` — the ds `system-ui` stack by default, matching image/badge text.
+- Docs: `docs/css-variables-reference.md` default values resynchronized with the actual code declarations (now guarded by the repo-level `tokens-parity` check F).
+- Docs: the README customization example no longer overrides `--hub-avatar-size` — the avatar box is sized from the `size` input at runtime (the inline host style overrules CSS), so the variable is reclassified as `INTERNAL` in the token spec; use the input to size the avatar.
+
 ## [22.5.0] - 2026-06-30
 
 ### Added

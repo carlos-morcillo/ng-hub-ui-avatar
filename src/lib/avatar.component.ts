@@ -338,7 +338,11 @@ export class AvatarComponent implements AfterContentInit, OnChanges, OnDestroy {
 			textTransform: 'uppercase',
 			color: hasCustomFgColor ? this.fgColor() : undefined,
 			backgroundColor: bgColor ? bgColor : this.avatarService.getRandomColor(avatarValue),
-			font: Math.floor(+this.size() / this.textSizeRatio()) + 'px Helvetica, Arial, sans-serif',
+			// Only the size is set inline (it scales with `size`); the family comes from
+			// `.avatar-content { font-family: var(--hub-avatar-font-family, …) }` so the
+			// initials honour the same token as the rest of the avatar (a `font` shorthand
+			// here would pin Helvetica and shadow it).
+			fontSize: Math.floor(+this.size() / this.textSizeRatio()) + 'px',
 			lineHeight: this.size() + 'px',
 			...this.getCustomStyleObject()
 		};
