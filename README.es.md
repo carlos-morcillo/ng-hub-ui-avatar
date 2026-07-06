@@ -275,7 +275,7 @@ Ejemplo de personalización agnóstica de framework:
 
 ```scss
 hub-avatar {
-	--hub-avatar-size: 64px;
+	/* el tamaño se controla con el input [size], no con una variable CSS */
 	--hub-avatar-border-radius: 16px;
 	--hub-avatar-fg-color: #ffffff;
 	--hub-avatar-bg-color: #0d6efd;

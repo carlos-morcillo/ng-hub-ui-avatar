@@ -69,7 +69,7 @@ Defined and consumed by `projects/avatar/src/lib/styles/avatar.scss`.
 
 | Variable | Default | Usage |
 | --- | --- | --- |
-| `--hub-avatar-size` | `50px` | Avatar width/height |
+| `--hub-avatar-size` | `50px` (runtime) | Avatar width/height — **written from the `size` input**; override the input, not this variable (the inline host style wins) |
 | `--hub-avatar-overflow` | `hidden` | Overflow clipping behavior |
 | `--hub-avatar-object-fit` | `cover` | Image content fit |
 
@@ -88,10 +88,10 @@ Defined and consumed by `projects/avatar/src/lib/styles/avatar.scss`.
 
 | Variable | Default | Usage |
 | --- | --- | --- |
-| `--hub-avatar-fg-color` | `var(--hub-ref-color-white, #fff)` | Text color for text avatars |
-| `--hub-avatar-bg-color` | `var(--hub-sys-color-primary, #0d6efd)` | Background for avatar content (accent by default; initials/value override it, images cover it) |
+| `--hub-avatar-fg-color` | `var(--hub-avatar-accent-on, var(--hub-ref-color-white, #fff))` | Text color for text avatars |
+| `--hub-avatar-bg-color` | `var(--hub-avatar-accent, var(--hub-sys-color-primary, #0d6efd))` | Background for avatar content (accent by default; initials/value override it, images cover it) |
 | `--hub-avatar-font-family` | `var(--hub-ref-font-family-base, Helvetica, Arial, sans-serif)` | Text avatar font family |
-| `--hub-avatar-font-weight` | `400` | Text avatar font weight |
+| `--hub-avatar-font-weight` | `var(--hub-ref-font-weight-base, 400)` | Text avatar font weight |
 | `--hub-avatar-font-size` | `calc(var(--hub-avatar-size, 50px) / 3)` | Text avatar font size |
 | `--hub-avatar-line-height` | `var(--hub-avatar-size, 50px)` | Text avatar line height |
 | `--hub-avatar-text-transform` | `uppercase` | Text transform for initials/value avatars |

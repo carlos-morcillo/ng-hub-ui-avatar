@@ -28,7 +28,11 @@
   --hub-avatar-bg-color: var(--hub-avatar-accent, var(--hub-sys-color-primary, #0d6efd));
   --hub-avatar-font-family: var(
     --hub-ref-font-family-base,
-    Helvetica,
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
     Arial,
     sans-serif
   );
@@ -86,7 +90,7 @@
     var(--hub-avatar-border-color, transparent);
   color: var(--hub-avatar-fg-color, var(--hub-ref-color-white, #fff));
   background-color: var(--hub-avatar-bg-color, var(--hub-sys-surface-page, #fff));
-  font-family: var(--hub-avatar-font-family, Helvetica, Arial, sans-serif);
+  font-family: var(--hub-avatar-font-family, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif);
   font-size: var(--hub-avatar-font-size, calc(var(--hub-avatar-size, 50px) / 3));
   font-weight: var(--hub-avatar-font-weight, var(--hub-ref-font-weight-base, 400));
   line-height: var(--hub-avatar-line-height, var(--hub-avatar-size, 50px));
@@ -184,7 +188,7 @@ img.avatar-content {
   height: var(--hub-avatar-badge-size, calc(var(--hub-avatar-size, 50px) * 0.28));
   padding-inline: var(--hub-avatar-badge-padding, calc(var(--hub-avatar-size, 50px) * 0.08));
   border-radius: var(--hub-sys-radius-pill, 50rem);
-  font-family: var(--hub-avatar-font-family, Helvetica, Arial, sans-serif);
+  font-family: var(--hub-avatar-font-family, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif);
   font-size: var(--hub-avatar-badge-font-size, calc(var(--hub-avatar-size, 50px) * 0.22));
   font-weight: var(--hub-ref-font-weight-bold, 700);
   line-height: 1;
