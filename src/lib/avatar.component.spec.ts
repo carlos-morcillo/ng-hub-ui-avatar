@@ -152,4 +152,32 @@ describe('AvatarComponent', () => {
             expect(component.avatarStyle['backgroundColor']).toBe('#123456');
         });
     });
+
+    // Any-colour badgeColor: a bareword resolves to its ds token (raw fallback),
+    // a literal colour is passed through unchanged onto the `--hub-avatar-badge-color` slot.
+    describe('badgeColor', () => {
+        beforeEach(() => {
+            // The shared mock reports every property as an avatar source; scope it back to the real
+            // source inputs so setting `badgeColor` isn't mistaken for a source in the auto-fired ngOnChanges.
+            vi.spyOn(avatarService, 'isSource').mockImplementation((prop: string) =>
+                ['facebook', 'gravatar', 'github', 'custom', 'initials', 'value'].includes(prop)
+            );
+        });
+
+        it('resolves a semantic name to its ds token with a raw fallback', () => {
+            fixture.componentRef.setInput('badgeColor', 'primary');
+            fixture.detectChanges();
+
+            expect(fixture.nativeElement.style.getPropertyValue('--hub-avatar-badge-color')).toBe(
+                'var(--hub-sys-color-primary, primary)'
+            );
+        });
+
+        it('passes a literal colour through unchanged', () => {
+            fixture.componentRef.setInput('badgeColor', '#ff0000');
+            fixture.detectChanges();
+
+            expect(fixture.nativeElement.style.getPropertyValue('--hub-avatar-badge-color')).toBe('#ff0000');
+        });
+    });
 });

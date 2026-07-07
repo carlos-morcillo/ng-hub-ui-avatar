@@ -2,7 +2,7 @@
 // ng-hub-ui-avatar — consumer SCSS helpers
 // ─────────────────────────────────────────────────────────────────────────
 //
-//   @use 'ng-hub-ui-avatar/styles/mixins/avatar-theme' as avatar;
+//   @use 'ng-hub-ui-avatar/styles' as avatar;
 //
 //   • hub-avatar-theme()          — override any --hub-avatar-* token in one call
 //   • hub-avatar-color-variants() — emit avatar + badge colour variants in a loop

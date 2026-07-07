@@ -5,6 +5,7 @@ import { map, takeWhile } from 'rxjs/operators';
 import { AvatarService } from './avatar.service';
 import { AsyncSource } from './sources/async-source';
 import { AvatarSource } from './sources/avatar-source.enum';
+import { resolveHubAccent } from './shared/resolve-hub-accent';
 import { Source } from './sources/source';
 import { SourceFactory } from './sources/source.factory';
 
@@ -70,6 +71,7 @@ export type HubAvatarBadgeColor = 'primary' | 'secondary' | 'success' | 'danger'
 	`,
 	host: {
 		'[attr.data-badge-color]': 'badgeColor() || null',
+		'[style.--hub-avatar-badge-color]': 'badgeColorVar()',
 		'[style.--hub-avatar-size]': 'avatarSizePx'
 	}
 })
@@ -115,6 +117,16 @@ export class AvatarComponent implements AfterContentInit, OnChanges, OnDestroy {
 	 * `--hub-avatar-badge-color`). When unset the badge uses a neutral default.
 	 */
 	readonly badgeColor = input<HubAvatarBadgeColor | (string & {}) | null>(null);
+
+	/**
+	 * Normalises {@link badgeColor} into a paintable value for the `--hub-avatar-badge-color`
+	 * accent slot, accepting ANY colour. A bareword (a semantic name, a host-registered accent,
+	 * or a CSS named colour) resolves to its design-system token `var(--hub-sys-color-<name>,
+	 * <name>)` — the raw word is the fallback so an unregistered name still paints. A literal
+	 * `#hex` / `rgb()` / `oklch()` / `var(...)` is passed through unchanged. `null` when unset,
+	 * so the SCSS default (and the builtin `@each` per `data-badge-color`) takes over.
+	 */
+	protected readonly badgeColorVar = computed(() => resolveHubAccent(this.badgeColor()));
 
 	/** True when a badge should be rendered (the `badge` input is set to anything but `null` / `false`). */
 	protected readonly _hasBadge = computed(() => {

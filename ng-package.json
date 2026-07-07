@@ -2,10 +2,20 @@
 	"$schema": "../../node_modules/ng-packagr/ng-package.schema.json",
 	"dest": "../../dist/avatar",
 	"deleteDestPath": false,
-	"allowedNonPeerDependencies": ["ts-md5"],
+	"allowedNonPeerDependencies": [
+		"ts-md5"
+	],
 	"lib": {
 		"entryFile": "src/public_api.ts",
-		"styleIncludePaths": ["src/lib/styles"]
+		"styleIncludePaths": [
+			"src/lib/styles"
+		]
 	},
-	"assets": ["src/lib/styles"]
+	"assets": [
+		{
+			"input": "src/lib/styles",
+			"glob": "**/*",
+			"output": "styles"
+		}
+	]
 }

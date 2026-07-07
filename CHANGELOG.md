@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.7.0] - 2026-07-07
+
+### Changed
+
+- **BREAKING (packaging) — SCSS ships at `ng-hub-ui-avatar/styles`.** The theme mixin now builds to `dist/avatar/styles/...` (was `dist/avatar/src/lib/styles/...`), so `@use 'ng-hub-ui-avatar/styles'` resolves. Update any `@use` that reached into `src/lib/styles`.
+
+- **`<hub-avatar>` `badgeColor` accepts ANY colour.** On top of the built-in semantic accents, the input now also accepts a **registered custom accent** and a **literal colour** (`#ff0000`, `rgb(...)`, `oklch(...)`, a CSS named colour), resolved through the shared `resolveHubAccent` resolver (a local copy of the canonical `ng-hub-ui-utils` helper): a bareword becomes `var(--hub-sys-color-<name>, <name>)`; a literal is used as-is. The single `--hub-<comp>-accent` slot derives the rest of the family, so built-in colours are unchanged.
+- **Internal — host bindings moved to the `host` metadata object.** `@HostBinding` / `@HostListener` decorators were replaced by the `host` object in the component/directive metadata (Angular style guide). No public API or behaviour change.
+
 ## [22.6.0] - 2026-07-07
 
 ### Added
