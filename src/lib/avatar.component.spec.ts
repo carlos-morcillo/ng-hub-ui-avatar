@@ -113,4 +113,43 @@ describe('AvatarComponent', () => {
         const avatarImgEl = fixture.debugElement.query(By.css('.avatar-container > img'));
         expect(avatarImgEl.nativeElement.src).toBe('https://fallback.example/avatar.png');
     });
+
+    // HUBUI-015 — the hash colour must not beat consumer theming.
+    describe('autoColor', () => {
+        beforeEach(() => {
+            // The shared mock reports every property as an avatar source; scope it back
+            // to the real source inputs so setting `autoColor` / `bgColor` isn't mistaken
+            // for a source in the auto-fired ngOnChanges.
+            vi.spyOn(avatarService, 'isSource').mockImplementation((prop: string) =>
+                ['facebook', 'gravatar', 'github', 'custom', 'initials', 'value'].includes(prop)
+            );
+        });
+
+        const buildInitials = (name: string) => {
+            fixture.componentRef.setInput('name', name);
+            component.ngOnChanges({ initials: new SimpleChange(null, name, true) });
+            fixture.detectChanges();
+        };
+
+        it('applies the hash background colour inline by default', () => {
+            vi.spyOn(avatarService, 'getRandomColor').mockReturnValue('rgb(1, 2, 3)');
+            buildInitials('John Doe');
+            expect(component.avatarStyle['backgroundColor']).toBe('rgb(1, 2, 3)');
+        });
+
+        it('omits the inline background colour when [autoColor]="false" so the token can theme it', () => {
+            const spy = vi.spyOn(avatarService, 'getRandomColor').mockReturnValue('rgb(1, 2, 3)');
+            fixture.componentRef.setInput('autoColor', false);
+            buildInitials('John Doe');
+            expect(component.avatarStyle['backgroundColor']).toBeUndefined();
+            expect(spy).not.toHaveBeenCalled();
+        });
+
+        it('still honours an explicit bgColor even when [autoColor]="false"', () => {
+            fixture.componentRef.setInput('autoColor', false);
+            fixture.componentRef.setInput('bgColor', '#123456');
+            buildInitials('John Doe');
+            expect(component.avatarStyle['backgroundColor']).toBe('#123456');
+        });
+    });
 });

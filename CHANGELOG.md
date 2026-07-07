@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.6.0] - 2026-07-07
+
+### Added
+
+- **`[autoColor]` input for initials avatars.** In `[name]` mode the background colour is derived from a hash of the name and applied inline, which beats any `--hub-avatar-bg-color` theme a consumer sets (and forced `!important` workarounds). `[autoColor]="false"` now suppresses that inline colour so the avatar can be themed purely through the `--hub-avatar-bg-color` CSS variable. Defaults to `true` (unchanged behaviour); an explicit `bgColor` still wins over both.
+
 ## [22.5.1] - 2026-07-02
 
 ### Fixed

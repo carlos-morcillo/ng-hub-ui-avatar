@@ -1,4 +1,4 @@
-import { AfterContentInit, Component, ElementRef, OnChanges, OnDestroy, SecurityContext, SimpleChanges, ViewChild, computed, input, output } from '@angular/core';
+import { AfterContentInit, Component, ElementRef, OnChanges, OnDestroy, SecurityContext, SimpleChanges, ViewChild, booleanAttribute, computed, input, output } from '@angular/core';
 
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { map, takeWhile } from 'rxjs/operators';
@@ -80,6 +80,13 @@ export class AvatarComponent implements AfterContentInit, OnChanges, OnDestroy {
 	readonly bgColor = input<string>();
 	readonly fgColor = input('#FFF');
 	readonly borderColor = input<string>();
+	/**
+	 * When `true` (default) an initials avatar gets a background colour derived from
+	 * a hash of its `name`, applied inline. Set to `false` to suppress that inline
+	 * colour so the avatar can be themed via the `--hub-avatar-bg-color` CSS variable
+	 * without needing `!important`. An explicit `bgColor` always wins over both.
+	 */
+	readonly autoColor = input(true, { transform: booleanAttribute });
 	readonly style = input<Style>({});
 	readonly cornerRadius = input<string | number>(0);
 	readonly facebook = input<string | null>(undefined, { alias: 'facebookId' });
@@ -337,7 +344,11 @@ export class AvatarComponent implements AfterContentInit, OnChanges, OnDestroy {
 			border: borderColor ? '1px solid ' + borderColor : undefined,
 			textTransform: 'uppercase',
 			color: hasCustomFgColor ? this.fgColor() : undefined,
-			backgroundColor: bgColor ? bgColor : this.avatarService.getRandomColor(avatarValue),
+			// Explicit `bgColor` wins; otherwise the hash colour is applied inline only
+			// while `autoColor` is on. With `[autoColor]="false"` no inline background is
+			// emitted, so `.avatar-content { background-color: var(--hub-avatar-bg-color, …) }`
+			// takes over and the consumer can theme the avatar through the token.
+			backgroundColor: bgColor ? bgColor : this.autoColor() ? this.avatarService.getRandomColor(avatarValue) : undefined,
 			// Only the size is set inline (it scales with `size`); the family comes from
 			// `.avatar-content { font-family: var(--hub-avatar-font-family, …) }` so the
 			// initials honour the same token as the rest of the avatar (a `font` shorthand
