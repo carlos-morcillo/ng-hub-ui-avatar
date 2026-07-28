@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.8.0] - 2026-07-28
+
+### Added
+
+- **`interactive` input** (default `false`): marks the avatar as an interactive control. When enabled, the container exposes `role="button"`, becomes focusable (`tabindex="0"`) and triggers `clickOnAvatar` with Enter/Space (Space scroll prevented). Enable it whenever you bind `(clickOnAvatar)` — the click target used to be mouse-only and invisible to assistive technology.
+
 ## [22.7.0] - 2026-07-07
 
 ### Changed
