@@ -35,7 +35,16 @@ export type HubAvatarBadgeColor = 'primary' | 'secondary' | 'success' | 'danger'
 	standalone: true,
 	styleUrl: './avatar.component.scss',
 	template: `
-		<div (click)="onAvatarClicked()" class="avatar-container" [class.hub-avatar--custom]="hasCustomContent" [style]="hostStyle">
+		<div
+			(click)="onAvatarClicked()"
+			(keydown.enter)="onAvatarKeydown($event)"
+			(keydown.space)="onAvatarKeydown($event)"
+			[attr.role]="interactive() ? 'button' : null"
+			[attr.tabindex]="interactive() ? 0 : null"
+			class="avatar-container"
+			[class.hub-avatar--custom]="hasCustomContent"
+			[style]="hostStyle"
+		>
 			<span #customContent class="hub-avatar__custom" [style]="customContentStyle"><ng-content></ng-content></span>
 			@if (!hasCustomContent) {
 				@if (avatarSrc) {
@@ -78,6 +87,13 @@ export type HubAvatarBadgeColor = 'primary' | 'secondary' | 'success' | 'danger'
 export class AvatarComponent implements AfterContentInit, OnChanges, OnDestroy {
 	readonly round = input(true);
 	readonly size = input<string | number>(50);
+
+	/**
+	 * Marks the avatar as an interactive control. When `true`, the container
+	 * exposes `role="button"`, becomes focusable and triggers `clickOnAvatar`
+	 * with Enter/Space. Enable it whenever you bind `(clickOnAvatar)`.
+	 */
+	readonly interactive = input(false, { transform: booleanAttribute });
 	readonly textSizeRatio = input(3);
 	readonly bgColor = input<string>();
 	readonly fgColor = input('#FFF');
@@ -175,6 +191,20 @@ export class AvatarComponent implements AfterContentInit, OnChanges, OnDestroy {
 
 	onAvatarClicked(): void {
 		this.clickOnAvatar.emit(this.sources[this.currentIndex]);
+	}
+
+	/**
+	 * Keyboard activation for the interactive avatar (Enter/Space). Inert unless
+	 * `interactive` is enabled; prevents the default Space scroll.
+	 *
+	 * @param event Keyboard event from the container.
+	 */
+	onAvatarKeydown(event: Event): void {
+		if (!this.interactive()) {
+			return;
+		}
+		event.preventDefault();
+		this.onAvatarClicked();
 	}
 
 	/**
