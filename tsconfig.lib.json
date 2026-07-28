@@ -12,6 +12,9 @@
 		"experimentalDecorators": true,
 		"importHelpers": true,
 		"types": [],
+		"paths": {
+			"ng-hub-ui-utils": ["../../dist/utils"]
+		},
 		"lib": [
 			"dom",
 			"es2022"

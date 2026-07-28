@@ -5,7 +5,7 @@ import { map, takeWhile } from 'rxjs/operators';
 import { AvatarService } from './avatar.service';
 import { AsyncSource } from './sources/async-source';
 import { AvatarSource } from './sources/avatar-source.enum';
-import { resolveHubAccent } from './shared/resolve-hub-accent';
+import { resolveHubAccent } from 'ng-hub-ui-utils';
 import { Source } from './sources/source';
 import { SourceFactory } from './sources/source.factory';
 
