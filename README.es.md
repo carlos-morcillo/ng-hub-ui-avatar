@@ -72,6 +72,15 @@ Fuentes de avatar soportadas:
 - Iniciales (`name`)
 - Valor de texto (`value`)
 
+> **Estas tres fuentes contactan con un tercero.** `secure.gravatar.com`, `api.github.com` y
+> `graph.facebook.com` se solicitan desde el navegador del visitante, así que esos servicios
+> ven su dirección IP — y Gravatar recibe además un hash del correo que le pasas, suficiente
+> para correlacionar a una persona entre todos los sitios que usan Gravatar. No es un defecto:
+> es lo que significa «resolver un avatar desde Gravatar». Pero conviene decidirlo a propósito
+> y no descubrirlo en la pestaña de red. Si no puedes enviar esos datos, usa las fuentes de
+> imagen propia, iniciales o texto, que no salen de tu propio origen.
+
+
 La reserva utiliza un orden de prioridad de fuentes. Por defecto, el componente prueba las fuentes soportadas en el orden configurado hasta que una tiene éxito.
 
 > Este proyecto es un fork de [ngx-avatars](https://github.com/Heatmanofurioso/ngx-avatars), que a su vez continuó el trabajo original de avatar. Este paquete adapta y mantiene el componente para aplicaciones Angular modernas.

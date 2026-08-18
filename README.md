@@ -72,6 +72,15 @@ Supported avatar sources:
 - Initials (`name`)
 - Text value (`value`)
 
+> **These three sources contact a third party.** `secure.gravatar.com`, `api.github.com` and
+> `graph.facebook.com` are reached from the visitor's browser, so those services see the
+> visitor's IP address — and Gravatar additionally receives a hash of the email address you
+> pass it, which is enough to correlate a person across every site that uses Gravatar. That is
+> not a defect, it is what "resolve an avatar from Gravatar" means; but it is a decision worth
+> making deliberately rather than discovering in a network tab. If you cannot send that data,
+> use the custom image, initials or text sources, which never leave your own origin.
+
+
 Fallback uses a source priority order. By default, the component tries the supported sources in their configured order until one succeeds.
 
 > This project is a fork of [ngx-avatars](https://github.com/Heatmanofurioso/ngx-avatars), which itself continued the original avatar work. This package adapts and maintains the component for modern Angular applications.

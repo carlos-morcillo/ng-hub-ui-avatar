@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.9.2] - 2026-08-18
+
+### Changed
+
+- **The README now says what the remote sources cost.** Gravatar, GitHub and Facebook were documented as sources and as "resolved over HTTP", which is accurate and stops one sentence short of the part a consumer has to decide on: those requests leave the visitor's browser, so the third party sees their IP address, and Gravatar also receives a hash of the email address passed to it — enough to correlate a person across every site using it.
+
+    Not a defect and nothing changed in the code: it is what resolving an avatar from Gravatar means. But it is a decision worth taking deliberately rather than finding in a network tab, and the alternative — custom image, initials or text — never leaves your own origin. Both READMEs carry it.
+
 ## [22.9.1] - 2026-08-08
 
 ### Fixed
