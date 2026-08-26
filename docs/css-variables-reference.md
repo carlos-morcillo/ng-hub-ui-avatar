@@ -90,7 +90,7 @@ Defined and consumed by `projects/avatar/src/lib/styles/avatar.scss`.
 | --- | --- | --- |
 | `--hub-avatar-fg-color` | `var(--hub-avatar-accent-on, var(--hub-ref-color-white, #fff))` | Text color for text avatars |
 | `--hub-avatar-bg-color` | `var(--hub-avatar-accent, var(--hub-sys-color-primary, #0d6efd))` | Background for avatar content (accent by default; initials/value override it, images cover it) |
-| `--hub-avatar-font-family` | `var(--hub-ref-font-family-base, Helvetica, Arial, sans-serif)` | Text avatar font family |
+| `--hub-avatar-font-family` | `var(--hub-ref-font-family-base, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif)` | Text avatar font family |
 | `--hub-avatar-font-weight` | `var(--hub-ref-font-weight-base, 400)` | Text avatar font weight |
 | `--hub-avatar-font-size` | `calc(var(--hub-avatar-size, 50px) / 3)` | Text avatar font size |
 | `--hub-avatar-line-height` | `var(--hub-avatar-size, 50px)` | Text avatar line height |
