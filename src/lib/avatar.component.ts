@@ -1,4 +1,17 @@
-import { AfterContentInit, Component, ElementRef, OnChanges, OnDestroy, SecurityContext, SimpleChanges, ViewChild, booleanAttribute, computed, input, output } from '@angular/core';
+import {
+	AfterContentInit,
+	Component,
+	ElementRef,
+	OnChanges,
+	OnDestroy,
+	SecurityContext,
+	SimpleChanges,
+	ViewChild,
+	booleanAttribute,
+	computed,
+	input,
+	output
+} from '@angular/core';
 
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { map, takeWhile } from 'rxjs/operators';
@@ -332,9 +345,7 @@ export class AvatarComponent implements AfterContentInit, OnChanges, OnDestroy {
 	 * Initialize the avatar component and its fallback system
 	 */
 	private initializeAvatar(): void {
-		const computedBorderRadius = this.round()
-			? '50%'
-			: this.cornerRadius() + 'px';
+		const computedBorderRadius = this.round() ? '50%' : this.cornerRadius() + 'px';
 		this.hostStyle = {
 			width: this.size() + 'px',
 			height: this.size() + 'px',

@@ -6,14 +6,11 @@ import { AvatarSource } from './avatar-source.enum';
  *  and image size
  */
 export class Facebook implements Source {
-  readonly sourceType: AvatarSource = AvatarSource.FACEBOOK;
+	readonly sourceType: AvatarSource = AvatarSource.FACEBOOK;
 
-  constructor(public sourceId: string) {}
+	constructor(public sourceId: string) {}
 
-  public getAvatar(size: number): string {
-    return (
-      'https://graph.facebook.com/' +
-      `${this.sourceId}/picture?width=${size}&height=${size}`
-    );
-  }
+	public getAvatar(size: number): string {
+		return 'https://graph.facebook.com/' + `${this.sourceId}/picture?width=${size}&height=${size}`;
+	}
 }

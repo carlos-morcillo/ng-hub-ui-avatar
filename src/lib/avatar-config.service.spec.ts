@@ -1,10 +1,6 @@
 import { AvatarConfig } from './avatar-config';
 import { AvatarConfigService } from './avatar-config.service';
-import {
-	defaultColors,
-	defaultDisableSrcCache,
-	defaultSources
-} from './avatar.service';
+import { defaultColors, defaultDisableSrcCache, defaultSources } from './avatar.service';
 import { AvatarSource } from './sources/avatar-source.enum';
 
 describe('AvatarConfigService', () => {
@@ -13,17 +9,13 @@ describe('AvatarConfigService', () => {
 			const userConfig: AvatarConfig = { sourcePriorityOrder: [] };
 			const avatarConfigService = new AvatarConfigService(userConfig);
 
-			expect(
-				avatarConfigService.getAvatarSources(defaultSources)
-			).toEqual(defaultSources);
+			expect(avatarConfigService.getAvatarSources(defaultSources)).toEqual(defaultSources);
 		});
 
 		it('should return the list of sources with the default order when the user does not provide a custom avatar configuration', () => {
 			const avatarConfigService = new AvatarConfigService({});
 
-			expect(
-				avatarConfigService.getAvatarSources(defaultSources)
-			).toEqual(defaultSources);
+			expect(avatarConfigService.getAvatarSources(defaultSources)).toEqual(defaultSources);
 		});
 
 		it('should return the list of sources with the default order when the user provides an unknown list of sources', () => {
@@ -32,17 +24,12 @@ describe('AvatarConfigService', () => {
 			};
 			const avatarConfigService = new AvatarConfigService(userConfig);
 
-			expect(
-				avatarConfigService.getAvatarSources(defaultSources)
-			).toEqual(defaultSources);
+			expect(avatarConfigService.getAvatarSources(defaultSources)).toEqual(defaultSources);
 		});
 
 		it('should override the source priority order when the user provides a valid list of sources', () => {
 			const userConfig: AvatarConfig = {
-				sourcePriorityOrder: [
-					AvatarSource.INITIALS,
-					AvatarSource.GRAVATAR
-				]
+				sourcePriorityOrder: [AvatarSource.INITIALS, AvatarSource.GRAVATAR]
 			};
 			const avatarConfigService = new AvatarConfigService(userConfig);
 
@@ -54,17 +41,12 @@ describe('AvatarConfigService', () => {
 				AvatarSource.CUSTOM,
 				AvatarSource.VALUE
 			];
-			expect(
-				avatarConfigService.getAvatarSources(defaultSources)
-			).toEqual(expectedSourcesOrder);
+			expect(avatarConfigService.getAvatarSources(defaultSources)).toEqual(expectedSourcesOrder);
 		});
 
 		it('should ignore redundant sources', () => {
 			const userConfig: AvatarConfig = {
-				sourcePriorityOrder: [
-					AvatarSource.INITIALS,
-					AvatarSource.INITIALS
-				]
+				sourcePriorityOrder: [AvatarSource.INITIALS, AvatarSource.INITIALS]
 			};
 			const avatarConfigService = new AvatarConfigService(userConfig);
 
@@ -76,9 +58,7 @@ describe('AvatarConfigService', () => {
 				AvatarSource.CUSTOM,
 				AvatarSource.VALUE
 			];
-			expect(
-				avatarConfigService.getAvatarSources(defaultSources)
-			).toEqual(expectedSourcesOrder);
+			expect(avatarConfigService.getAvatarSources(defaultSources)).toEqual(expectedSourcesOrder);
 		});
 	});
 
@@ -91,17 +71,13 @@ describe('AvatarConfigService', () => {
 
 			const avatarConfigService = new AvatarConfigService(userConfig);
 
-			expect(avatarConfigService.getAvatarColors(defaultColors)).toBe(
-				userColors
-			);
+			expect(avatarConfigService.getAvatarColors(defaultColors)).toBe(userColors);
 		});
 
 		it('should return the default colors when no colors are provided in the avatar configuration', () => {
 			const avatarConfigService = new AvatarConfigService({});
 
-			expect(avatarConfigService.getAvatarColors(defaultColors)).toBe(
-				defaultColors
-			);
+			expect(avatarConfigService.getAvatarColors(defaultColors)).toBe(defaultColors);
 		});
 	});
 });
@@ -115,16 +91,12 @@ describe('AvatarDisableCache', () => {
 
 		const avatarConfigService = new AvatarConfigService(userConfig);
 
-		expect(
-			avatarConfigService.getDisableSrcCache(defaultDisableSrcCache)
-		).toBe(userDisableSrcCache);
+		expect(avatarConfigService.getDisableSrcCache(defaultDisableSrcCache)).toBe(userDisableSrcCache);
 	});
 
 	it('should return the default disable custom source cache settings when no settings are provided in the avatar configuration', () => {
 		const avatarConfigService = new AvatarConfigService({});
 
-		expect(
-			avatarConfigService.getDisableSrcCache(defaultDisableSrcCache)
-		).toBe(defaultDisableSrcCache);
+		expect(avatarConfigService.getDisableSrcCache(defaultDisableSrcCache)).toBe(defaultDisableSrcCache);
 	});
 });

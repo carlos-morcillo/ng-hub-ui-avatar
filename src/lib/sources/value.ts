@@ -6,11 +6,11 @@ import { AvatarSource } from './avatar-source.enum';
  *  return the value as avatar
  */
 export class Value implements Source {
-  readonly sourceType: AvatarSource = AvatarSource.VALUE;
+	readonly sourceType: AvatarSource = AvatarSource.VALUE;
 
-  constructor(public sourceId: string) {}
+	constructor(public sourceId: string) {}
 
-  public getAvatar(): string {
-    return this.sourceId;
-  }
+	public getAvatar(): string {
+		return this.sourceId;
+	}
 }

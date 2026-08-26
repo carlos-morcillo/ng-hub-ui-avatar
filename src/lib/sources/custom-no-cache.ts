@@ -1,5 +1,5 @@
-import {Source} from './source';
-import {AvatarSource} from './avatar-source.enum';
+import { Source } from './source';
+import { AvatarSource } from './avatar-source.enum';
 
 /**
  *  Custom source implementation (with no cache).
@@ -7,12 +7,12 @@ import {AvatarSource} from './avatar-source.enum';
  *
  */
 export class CustomNoCache implements Source {
-  readonly sourceType: AvatarSource = AvatarSource.CUSTOM;
+	readonly sourceType: AvatarSource = AvatarSource.CUSTOM;
 
-  constructor(public sourceId: string) {}
+	constructor(public sourceId: string) {}
 
-  public getAvatar(): string {
-    const urlSuffix = Math.random();
-    return `${this.sourceId}${this.sourceId.indexOf('?') > -1 ? '&' : '?'}_=${urlSuffix}`;
-  }
+	public getAvatar(): string {
+		const urlSuffix = Math.random();
+		return `${this.sourceId}${this.sourceId.indexOf('?') > -1 ? '&' : '?'}_=${urlSuffix}`;
+	}
 }

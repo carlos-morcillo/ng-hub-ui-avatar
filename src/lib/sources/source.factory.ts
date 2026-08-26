@@ -17,21 +17,21 @@ import { CustomNoCache } from './custom-no-cache';
  * Used to create Source implementation class based
  * on the source Type
  */
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class SourceFactory {
-  private sources: { [key: string]: SourceCreator } = {};
+	private sources: { [key: string]: SourceCreator } = {};
 
-  constructor(avatarConfigService: AvatarConfigService) {
-    const disableSrcCache = avatarConfigService.getDisableSrcCache(defaultDisableSrcCache);
-    this.sources[AvatarSource.FACEBOOK] = Facebook;
-    this.sources[AvatarSource.GRAVATAR] = Gravatar;
-    this.sources[AvatarSource.CUSTOM] = disableSrcCache ? CustomNoCache : Custom;
-    this.sources[AvatarSource.INITIALS] = Initials;
-    this.sources[AvatarSource.VALUE] = Value;
-    this.sources[AvatarSource.GITHUB] = Github;
-  }
+	constructor(avatarConfigService: AvatarConfigService) {
+		const disableSrcCache = avatarConfigService.getDisableSrcCache(defaultDisableSrcCache);
+		this.sources[AvatarSource.FACEBOOK] = Facebook;
+		this.sources[AvatarSource.GRAVATAR] = Gravatar;
+		this.sources[AvatarSource.CUSTOM] = disableSrcCache ? CustomNoCache : Custom;
+		this.sources[AvatarSource.INITIALS] = Initials;
+		this.sources[AvatarSource.VALUE] = Value;
+		this.sources[AvatarSource.GITHUB] = Github;
+	}
 
-  public newInstance(sourceType: AvatarSource, sourceValue: string): Source {
-    return new this.sources[sourceType](sourceValue);
-  }
+	public newInstance(sourceType: AvatarSource, sourceValue: string): Source {
+		return new this.sources[sourceType](sourceValue);
+	}
 }

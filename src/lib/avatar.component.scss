@@ -1,113 +1,118 @@
 :root,
 :host {
-  --hub-avatar-size: 50px;
-  --hub-avatar-overflow: hidden;
-  --hub-avatar-border-radius-round: 50%;
-  --hub-avatar-border-radius-square: var(--hub-ref-radius-sm, 0.25rem);
-  --hub-avatar-border-radius: var(
-    --hub-avatar-border-radius-round,
-    var(--hub-avatar-border-radius-square, 0.25rem)
-  );
-  --hub-avatar-border-width-default: var(--hub-ref-border-width, 1px);
-  --hub-avatar-border-width: 0;
-  --hub-avatar-border-color: transparent;
-  // Semantic accent — a single slot that the colour variants re-base (@each /
-  // map below). The role family is derived LOCALLY from it, mirroring the ds
-  // engine, so any accent — a known variant or a custom `brand` — yields a
-  // coherent circle fill + legible foreground with no recompilation. `-on` is a
-  // grayscale contrast flip driven by the accent's own lightness: it feeds the
-  // foreground so light accents (e.g. `light`) read with dark text out of the box.
-  --hub-avatar-accent: var(--hub-sys-color-primary, #0d6efd);
-  --hub-avatar-accent-emphasis: color-mix(in oklch, var(--hub-avatar-accent) 80%, var(--hub-sys-color-ink, #212529));
-  --hub-avatar-accent-subtle: color-mix(in oklch, var(--hub-avatar-accent) 12%, var(--hub-sys-surface-page, #fff));
-  --hub-avatar-accent-on: oklch(from var(--hub-avatar-accent) clamp(0, (0.62 - l) * 1000, 1) 0 h);
-  --hub-avatar-fg-color: var(--hub-avatar-accent-on, var(--hub-ref-color-white, #fff));
-  // Accent fill by default (like a milestone node) so icon/content avatars read
-  // as a coloured circle out of the box. Fed from the accent slot. Initials/value
-  // avatars override this with their own (auto/`bgColor`) colour; images cover it.
-  --hub-avatar-bg-color: var(--hub-avatar-accent, var(--hub-sys-color-primary, #0d6efd));
-  --hub-avatar-font-family: var(
-    --hub-ref-font-family-base,
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    Roboto,
-    'Helvetica Neue',
-    Arial,
-    sans-serif
-  );
-  --hub-avatar-font-weight: var(--hub-ref-font-weight-base, 400);
-  --hub-avatar-font-size: calc(var(--hub-avatar-size, 50px) / 3);
-  --hub-avatar-line-height: var(--hub-avatar-size, 50px);
-  --hub-avatar-text-transform: uppercase;
-  --hub-avatar-text-align: center;
-  --hub-avatar-object-fit: cover;
+	--hub-avatar-size: 50px;
+	--hub-avatar-overflow: hidden;
+	--hub-avatar-border-radius-round: 50%;
+	--hub-avatar-border-radius-square: var(--hub-ref-radius-sm, 0.25rem);
+	--hub-avatar-border-radius: var(--hub-avatar-border-radius-round, var(--hub-avatar-border-radius-square, 0.25rem));
+	--hub-avatar-border-width-default: var(--hub-ref-border-width, 1px);
+	--hub-avatar-border-width: 0;
+	--hub-avatar-border-color: transparent;
+	// Semantic accent — a single slot that the colour variants re-base (@each /
+	// map below). The role family is derived LOCALLY from it, mirroring the ds
+	// engine, so any accent — a known variant or a custom `brand` — yields a
+	// coherent circle fill + legible foreground with no recompilation. `-on` is a
+	// grayscale contrast flip driven by the accent's own lightness: it feeds the
+	// foreground so light accents (e.g. `light`) read with dark text out of the box.
+	--hub-avatar-accent: var(--hub-sys-color-primary, #0d6efd);
+	--hub-avatar-accent-emphasis: color-mix(in oklch, var(--hub-avatar-accent) 80%, var(--hub-sys-color-ink, #212529));
+	--hub-avatar-accent-subtle: color-mix(in oklch, var(--hub-avatar-accent) 12%, var(--hub-sys-surface-page, #fff));
+	--hub-avatar-accent-on: oklch(from var(--hub-avatar-accent) clamp(0, (0.62 - l) * 1000, 1) 0 h);
+	--hub-avatar-fg-color: var(--hub-avatar-accent-on, var(--hub-ref-color-white, #fff));
+	// Accent fill by default (like a milestone node) so icon/content avatars read
+	// as a coloured circle out of the box. Fed from the accent slot. Initials/value
+	// avatars override this with their own (auto/`bgColor`) colour; images cover it.
+	--hub-avatar-bg-color: var(--hub-avatar-accent, var(--hub-sys-color-primary, #0d6efd));
+	--hub-avatar-font-family: var(
+		--hub-ref-font-family-base,
+		system-ui,
+		-apple-system,
+		'Segoe UI',
+		Roboto,
+		'Helvetica Neue',
+		Arial,
+		sans-serif
+	);
+	--hub-avatar-font-weight: var(--hub-ref-font-weight-base, 400);
+	--hub-avatar-font-size: calc(var(--hub-avatar-size, 50px) / 3);
+	--hub-avatar-line-height: var(--hub-avatar-size, 50px);
+	--hub-avatar-text-transform: uppercase;
+	--hub-avatar-text-align: center;
+	--hub-avatar-object-fit: cover;
 
-  // Projected custom content (icon / SVG / image placed inside <hub-avatar>).
-  // Only sizing is content-specific; the background and foreground are the
-  // avatar's own (--hub-avatar-bg-color / --hub-avatar-fg-color). Sizes are
-  // relative to --hub-avatar-size so they scale with the avatar.
-  --hub-avatar-content-padding: calc(var(--hub-avatar-size, 50px) * 0.2);
-  --hub-avatar-content-icon-size: calc(var(--hub-avatar-size, 50px) * 0.55);
+	// Projected custom content (icon / SVG / image placed inside <hub-avatar>).
+	// Only sizing is content-specific; the background and foreground are the
+	// avatar's own (--hub-avatar-bg-color / --hub-avatar-fg-color). Sizes are
+	// relative to --hub-avatar-size so they scale with the avatar.
+	--hub-avatar-content-padding: calc(var(--hub-avatar-size, 50px) * 0.2);
+	--hub-avatar-content-icon-size: calc(var(--hub-avatar-size, 50px) * 0.55);
 
-  // Corner badge (a plain dot or a labelled count/text) — scales with --hub-avatar-size.
-  --hub-avatar-badge-size: calc(var(--hub-avatar-size, 50px) * 0.28);
-  --hub-avatar-badge-offset: 0px;
-  --hub-avatar-badge-ring-width: max(2px, calc(var(--hub-avatar-size, 50px) * 0.05));
-  --hub-avatar-badge-ring-color: var(--hub-sys-surface-page, #fff);
-  // Default badge fill — neutral; pick a semantic colour with the `badgeColor` input.
-  --hub-avatar-badge-color: var(--hub-sys-color-secondary, #6c757d);
-  --hub-avatar-badge-text-color: var(--hub-ref-color-white, #fff);
-  --hub-avatar-badge-font-size: calc(var(--hub-avatar-size, 50px) * 0.22);
-  --hub-avatar-badge-padding: calc(var(--hub-avatar-size, 50px) * 0.08);
+	// Corner badge (a plain dot or a labelled count/text) — scales with --hub-avatar-size.
+	--hub-avatar-badge-size: calc(var(--hub-avatar-size, 50px) * 0.28);
+	--hub-avatar-badge-offset: 0px;
+	--hub-avatar-badge-ring-width: max(2px, calc(var(--hub-avatar-size, 50px) * 0.05));
+	--hub-avatar-badge-ring-color: var(--hub-sys-surface-page, #fff);
+	// Default badge fill — neutral; pick a semantic colour with the `badgeColor` input.
+	--hub-avatar-badge-color: var(--hub-sys-color-secondary, #6c757d);
+	--hub-avatar-badge-text-color: var(--hub-ref-color-white, #fff);
+	--hub-avatar-badge-font-size: calc(var(--hub-avatar-size, 50px) * 0.22);
+	--hub-avatar-badge-padding: calc(var(--hub-avatar-size, 50px) * 0.08);
 
-  // Stacked group
-  --hub-avatar-group-overlap: calc(var(--hub-avatar-size, 50px) * 0.3);
-  --hub-avatar-group-ring-width: max(2px, calc(var(--hub-avatar-size, 50px) * 0.04));
-  --hub-avatar-group-ring-color: var(--hub-sys-surface-page, #fff);
+	// Stacked group
+	--hub-avatar-group-overlap: calc(var(--hub-avatar-size, 50px) * 0.3);
+	--hub-avatar-group-ring-width: max(2px, calc(var(--hub-avatar-size, 50px) * 0.04));
+	--hub-avatar-group-ring-color: var(--hub-sys-surface-page, #fff);
 }
 
 :host {
-  display: inline-block;
-  position: relative;
-  border-radius: var(--hub-avatar-border-radius, 50%);
+	display: inline-block;
+	position: relative;
+	border-radius: var(--hub-avatar-border-radius, 50%);
 }
 
 .avatar-container {
-  width: var(--hub-avatar-size, 50px);
-  height: var(--hub-avatar-size, 50px);
-  border-radius: var(--hub-avatar-border-radius, 50%);
-  overflow: var(--hub-avatar-overflow, hidden);
+	width: var(--hub-avatar-size, 50px);
+	height: var(--hub-avatar-size, 50px);
+	border-radius: var(--hub-avatar-border-radius, 50%);
+	overflow: var(--hub-avatar-overflow, hidden);
 }
 
 .avatar-content {
-  width: 100%;
-  height: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  border-radius: var(--hub-avatar-border-radius, 50%);
-  border: var(--hub-avatar-border-width, 0) solid
-    var(--hub-avatar-border-color, transparent);
-  color: var(--hub-avatar-fg-color, var(--hub-ref-color-white, #fff));
-  background-color: var(--hub-avatar-bg-color, var(--hub-sys-surface-page, #fff));
-  font-family: var(--hub-avatar-font-family, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif);
-  font-size: var(--hub-avatar-font-size, calc(var(--hub-avatar-size, 50px) / 3));
-  font-weight: var(--hub-avatar-font-weight, var(--hub-ref-font-weight-base, 400));
-  line-height: var(--hub-avatar-line-height, var(--hub-avatar-size, 50px));
-  text-transform: var(--hub-avatar-text-transform, uppercase);
-  text-align: var(--hub-avatar-text-align, center);
+	width: 100%;
+	height: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
+	border-radius: var(--hub-avatar-border-radius, 50%);
+	border: var(--hub-avatar-border-width, 0) solid var(--hub-avatar-border-color, transparent);
+	color: var(--hub-avatar-fg-color, var(--hub-ref-color-white, #fff));
+	background-color: var(--hub-avatar-bg-color, var(--hub-sys-surface-page, #fff));
+	font-family: var(
+		--hub-avatar-font-family,
+		system-ui,
+		-apple-system,
+		'Segoe UI',
+		Roboto,
+		'Helvetica Neue',
+		Arial,
+		sans-serif
+	);
+	font-size: var(--hub-avatar-font-size, calc(var(--hub-avatar-size, 50px) / 3));
+	font-weight: var(--hub-avatar-font-weight, var(--hub-ref-font-weight-base, 400));
+	line-height: var(--hub-avatar-line-height, var(--hub-avatar-size, 50px));
+	text-transform: var(--hub-avatar-text-transform, uppercase);
+	text-align: var(--hub-avatar-text-align, center);
 }
 
 div.avatar-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 img.avatar-content {
-  display: block;
-  object-fit: var(--hub-avatar-object-fit, cover);
-  background-color: transparent;
+	display: block;
+	object-fit: var(--hub-avatar-object-fit, cover);
+	background-color: transparent;
 }
 
 // ─── Projected custom content ────────────────────────────────────────────────
@@ -117,31 +122,31 @@ img.avatar-content {
 // SVG/img fill the padded box. A themed circle background and a readable
 // foreground are the defaults (override with `bgColor` / `fgColor` or the tokens).
 .hub-avatar__custom {
-  display: none;
+	display: none;
 }
 
 .hub-avatar--custom .hub-avatar__custom {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-  padding: var(--hub-avatar-content-padding, calc(var(--hub-avatar-size, 50px) * 0.2));
-  border-radius: inherit;
-  overflow: hidden;
-  // The circle is the avatar's own background (accent by default); the icon uses
-  // the avatar foreground (white) for contrast. `bgColor` / `fgColor` override both.
-  background-color: var(--hub-avatar-bg-color, var(--hub-sys-color-primary, #0d6efd));
-  color: var(--hub-avatar-fg-color, var(--hub-ref-color-white, #fff));
-  font-size: var(--hub-avatar-content-icon-size, calc(var(--hub-avatar-size, 50px) * 0.55));
-  line-height: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+	padding: var(--hub-avatar-content-padding, calc(var(--hub-avatar-size, 50px) * 0.2));
+	border-radius: inherit;
+	overflow: hidden;
+	// The circle is the avatar's own background (accent by default); the icon uses
+	// the avatar foreground (white) for contrast. `bgColor` / `fgColor` override both.
+	background-color: var(--hub-avatar-bg-color, var(--hub-sys-color-primary, #0d6efd));
+	color: var(--hub-avatar-fg-color, var(--hub-ref-color-white, #fff));
+	font-size: var(--hub-avatar-content-icon-size, calc(var(--hub-avatar-size, 50px) * 0.55));
+	line-height: 1;
 }
 
 // Font-based icons and emoji inherit the font-size and colour above, so they
 // scale and theme with no extra wiring.
 .hub-avatar--custom .hub-avatar__custom > * {
-  line-height: 1;
+	line-height: 1;
 }
 
 // Inline SVG and <img> are sized by box, not font-size: make them fill the
@@ -149,12 +154,12 @@ img.avatar-content {
 // encapsulation so the projected children (owned by the consumer) are reached.
 .hub-avatar--custom .hub-avatar__custom ::ng-deep svg,
 .hub-avatar--custom .hub-avatar__custom ::ng-deep img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
+	display: block;
+	width: 100%;
+	height: 100%;
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: contain;
 }
 
 // ─── Corner badge (dot or labelled) ──────────────────────────────────────────
@@ -162,36 +167,45 @@ img.avatar-content {
 // a labelled pill (`badge="4k"`). Colour it with the `badgeColor` input → the
 // @each loop below re-bases --hub-avatar-badge-color per semantic colour.
 .hub-avatar__badge {
-  position: absolute;
-  inset-block-end: var(--hub-avatar-badge-offset, 0px);
-  inset-inline-end: var(--hub-avatar-badge-offset, 0px);
-  box-sizing: border-box;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--hub-avatar-badge-color, var(--hub-sys-color-secondary, #6c757d));
-  color: var(--hub-avatar-badge-text-color, var(--hub-ref-color-white, #fff));
-  box-shadow: 0 0 0 var(--hub-avatar-badge-ring-width, 2px)
-    var(--hub-avatar-badge-ring-color, var(--hub-sys-surface-page, #fff));
+	position: absolute;
+	inset-block-end: var(--hub-avatar-badge-offset, 0px);
+	inset-inline-end: var(--hub-avatar-badge-offset, 0px);
+	box-sizing: border-box;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--hub-avatar-badge-color, var(--hub-sys-color-secondary, #6c757d));
+	color: var(--hub-avatar-badge-text-color, var(--hub-ref-color-white, #fff));
+	box-shadow: 0 0 0 var(--hub-avatar-badge-ring-width, 2px)
+		var(--hub-avatar-badge-ring-color, var(--hub-sys-surface-page, #fff));
 }
 
 // Dot — a small circle, no content.
 .hub-avatar__badge--dot {
-  width: var(--hub-avatar-badge-size, calc(var(--hub-avatar-size, 50px) * 0.28));
-  height: var(--hub-avatar-badge-size, calc(var(--hub-avatar-size, 50px) * 0.28));
-  border-radius: 50%;
+	width: var(--hub-avatar-badge-size, calc(var(--hub-avatar-size, 50px) * 0.28));
+	height: var(--hub-avatar-badge-size, calc(var(--hub-avatar-size, 50px) * 0.28));
+	border-radius: 50%;
 }
 
 // Label — a pill carrying text / a count.
 .hub-avatar__badge--label {
-  min-width: var(--hub-avatar-badge-size, calc(var(--hub-avatar-size, 50px) * 0.28));
-  height: var(--hub-avatar-badge-size, calc(var(--hub-avatar-size, 50px) * 0.28));
-  padding-inline: var(--hub-avatar-badge-padding, calc(var(--hub-avatar-size, 50px) * 0.08));
-  border-radius: var(--hub-sys-radius-pill, 50rem);
-  font-family: var(--hub-avatar-font-family, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif);
-  font-size: var(--hub-avatar-badge-font-size, calc(var(--hub-avatar-size, 50px) * 0.22));
-  font-weight: var(--hub-ref-font-weight-bold, 700);
-  line-height: 1;
+	min-width: var(--hub-avatar-badge-size, calc(var(--hub-avatar-size, 50px) * 0.28));
+	height: var(--hub-avatar-badge-size, calc(var(--hub-avatar-size, 50px) * 0.28));
+	padding-inline: var(--hub-avatar-badge-padding, calc(var(--hub-avatar-size, 50px) * 0.08));
+	border-radius: var(--hub-sys-radius-pill, 50rem);
+	font-family: var(
+		--hub-avatar-font-family,
+		system-ui,
+		-apple-system,
+		'Segoe UI',
+		Roboto,
+		'Helvetica Neue',
+		Arial,
+		sans-serif
+	);
+	font-size: var(--hub-avatar-badge-font-size, calc(var(--hub-avatar-size, 50px) * 0.22));
+	font-weight: var(--hub-ref-font-weight-bold, 700);
+	line-height: 1;
 }
 
 // Built-in semantic variants (open set): badge colour (per `badgeColor`) and a
@@ -204,12 +218,12 @@ img.avatar-content {
 $hub-avatar-semantic: primary, secondary, success, danger, warning, info, neutral, light, dark;
 
 @each $name in $hub-avatar-semantic {
-  :host([data-badge-color='#{$name}']) {
-    --hub-avatar-badge-color: var(--hub-sys-color-#{$name});
-  }
-  :host(.hub-avatar--#{$name}) {
-    --hub-avatar-accent: var(--hub-sys-color-#{$name});
-  }
+	:host([data-badge-color='#{$name}']) {
+		--hub-avatar-badge-color: var(--hub-sys-color-#{$name});
+	}
+	:host(.hub-avatar--#{$name}) {
+		--hub-avatar-accent: var(--hub-sys-color-#{$name});
+	}
 }
 
 // Open-set escape hatch — any custom accent (e.g. a `brand` the host app adds to
@@ -226,22 +240,22 @@ $hub-avatar-semantic: primary, secondary, success, danger, warning, info, neutra
 // of the avatar accent slot (set via `badgeColor`), so it keeps its own fixup.
 :host([data-badge-color='warning']),
 :host([data-badge-color='light']) {
-  --hub-avatar-badge-text-color: var(--hub-sys-text-primary, #212529);
+	--hub-avatar-badge-text-color: var(--hub-sys-text-primary, #212529);
 }
 
 // ─── Stacked group ───────────────────────────────────────────────────────────
 // Wrap several <hub-avatar> in a `.hub-avatar-group` to overlap them; each gets
 // a ring so the edges read cleanly.
 .hub-avatar-group {
-  display: inline-flex;
-  align-items: center;
+	display: inline-flex;
+	align-items: center;
 }
 
 .hub-avatar-group hub-avatar {
-  box-shadow: 0 0 0 var(--hub-avatar-group-ring-width, 2px)
-    var(--hub-avatar-group-ring-color, var(--hub-sys-surface-page, #fff));
+	box-shadow: 0 0 0 var(--hub-avatar-group-ring-width, 2px)
+		var(--hub-avatar-group-ring-color, var(--hub-sys-surface-page, #fff));
 }
 
 .hub-avatar-group hub-avatar + hub-avatar {
-  margin-inline-start: calc(-1 * var(--hub-avatar-group-overlap, 15px));
+	margin-inline-start: calc(-1 * var(--hub-avatar-group-overlap, 15px));
 }
