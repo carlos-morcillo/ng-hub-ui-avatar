@@ -1,19 +1,23 @@
 import {
 	AfterContentInit,
+	ChangeDetectionStrategy,
 	Component,
 	ElementRef,
-	OnChanges,
 	OnDestroy,
 	SecurityContext,
-	SimpleChanges,
 	ViewChild,
 	booleanAttribute,
 	computed,
+	effect,
+	inject,
 	input,
-	output
+	linkedSignal,
+	output,
+	signal,
+	untracked
 } from '@angular/core';
 
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeUrl, SafeValue } from '@angular/platform-browser';
 import { map, takeWhile } from 'rxjs/operators';
 import { AvatarService } from './avatar.service';
 import { AsyncSource } from './sources/async-source';
@@ -34,18 +38,15 @@ type Style = StyleObject | string;
 export type HubAvatarBadgeColor = 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark';
 
 /**
- * Universal avatar component that
- * generates avatar from different sources
- *
- * export
- * class AvatarComponent
- * implements {OnChanges}
+ * Universal avatar component that generates an avatar from several sources, falling
+ * back from one to the next as each fails to resolve.
  */
 
 @Component({
 	// tslint:disable-next-line:component-selector
 	selector: 'hub-avatar',
 	standalone: true,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	styleUrl: './avatar.component.scss',
 	template: `
 		<div
@@ -55,27 +56,27 @@ export type HubAvatarBadgeColor = 'primary' | 'secondary' | 'success' | 'danger'
 			[attr.role]="interactive() ? 'button' : null"
 			[attr.tabindex]="interactive() ? 0 : null"
 			class="avatar-container"
-			[class.hub-avatar--custom]="hasCustomContent"
-			[style]="hostStyle"
+			[class.hub-avatar--custom]="hasCustomContent()"
+			[style]="hostStyle()"
 		>
-			<span #customContent class="hub-avatar__custom" [style]="customContentStyle"><ng-content></ng-content></span>
-			@if (!hasCustomContent) {
-				@if (avatarSrc) {
+			<span #customContent class="hub-avatar__custom" [style]="customContentStyle()"><ng-content></ng-content></span>
+			@if (!hasCustomContent()) {
+				@if (avatarSrc(); as src) {
 					<img
-						[src]="avatarSrc"
-						[alt]="customAlt() ? customAlt() : avatarAlt"
+						[src]="src"
+						[alt]="avatarAlt()"
 						[width]="size()"
 						[height]="size()"
-						[style]="avatarStyle"
+						[style]="avatarStyle()"
 						[referrerPolicy]="referrerpolicy()"
 						(error)="fetchAvatarSource()"
 						class="avatar-content"
 						loading="lazy"
 					/>
 				} @else {
-					@if (avatarText) {
-						<div class="avatar-content" [style]="avatarStyle">
-							{{ avatarText }}
+					@if (avatarText(); as text) {
+						<div class="avatar-content" [style]="avatarStyle()">
+							{{ text }}
 						</div>
 					}
 				}
@@ -97,7 +98,11 @@ export type HubAvatarBadgeColor = 'primary' | 'secondary' | 'success' | 'danger'
 		'[style.--hub-avatar-size]': 'avatarSizePx'
 	}
 })
-export class AvatarComponent implements AfterContentInit, OnChanges, OnDestroy {
+export class AvatarComponent implements AfterContentInit, OnDestroy {
+	private readonly sourceFactory = inject(SourceFactory);
+	private readonly avatarService = inject(AvatarService);
+	private readonly sanitizer = inject(DomSanitizer);
+
 	readonly round = input(true);
 	readonly size = input<string | number>(50);
 
@@ -175,35 +180,143 @@ export class AvatarComponent implements AfterContentInit, OnChanges, OnDestroy {
 	/** True when the badge is a plain dot (shown, but with no text content). */
 	protected readonly _isDot = computed(() => this._hasBadge() && this._badgeText() === '');
 
-	readonly clickOnAvatar = output<Source>();
+	/**
+	 * Fires when the avatar is clicked, or activated with Enter/Space while `interactive`.
+	 * It carries the {@link Source} currently painting the avatar, and `null` when there is
+	 * none: an avatar built only from projected content has nothing to report, and neither
+	 * has one whose every source failed. The `null` is declared rather than leaked so a
+	 * handler is told to expect it instead of tripping over an undefined payload.
+	 */
+	readonly clickOnAvatar = output<Source | null>();
 
 	/** Wrapper around the projected content (`<ng-content>`), used to detect whether the consumer projected anything. */
 	@ViewChild('customContent', { static: true }) private customContentRef?: ElementRef<HTMLElement>;
 
 	/** True when the consumer projected custom content (an icon, SVG, image, …) into the avatar. */
-	hasCustomContent = false;
+	protected readonly hasCustomContent = signal(false);
 
 	/** Inline style applied to the projected-content slot (honours `bgColor` / `fgColor` / `borderColor` / `style`). */
-	customContentStyle: StyleObject = {};
+	protected readonly customContentStyle = computed<StyleObject>(() =>
+		this.hasCustomContent() ? this.getCustomContentStyle() : {}
+	);
 
 	isAlive = true;
-	avatarSrc: SafeUrl | null = null;
-	avatarAlt: SafeUrl | null = null;
-	avatarText: string | null = null;
-	avatarStyle: StyleObject = {};
-	hostStyle: StyleObject = {};
 
-	private currentIndex = -1;
-	private sources: Source[] = [];
+	/**
+	 * Accessible name of the avatar image. An explicit `alt` wins; otherwise the person's
+	 * `name` describes the picture, and with neither the image is decorative and the
+	 * attribute stays empty. It must never fall back to the resolved source, or a screen
+	 * reader announces the whole Gravatar URL instead of naming anyone.
+	 */
+	readonly avatarAlt = computed(() => this.customAlt() ?? this.initials() ?? '');
 
-	constructor(
-		private sourceFactory: SourceFactory,
-		private avatarService: AvatarService,
-		private sanitizer: DomSanitizer
-	) {}
+	/**
+	 * The fallback chain, rebuilt whole from the source inputs and ordered by the priority the
+	 * service is configured with. It is derived rather than patched entry by entry: walking
+	 * `SimpleChanges` to add and remove sources reconstructed this same function by hand, and
+	 * got it wrong at the edges — emptying the chain left the last resolved avatar on screen.
+	 */
+	private readonly sources = computed<Source[]>(() => {
+		const declared: ReadonlyArray<readonly [AvatarSource, unknown]> = [
+			[AvatarSource.FACEBOOK, this.facebook()],
+			[AvatarSource.GRAVATAR, this.gravatar()],
+			[AvatarSource.GITHUB, this.github()],
+			[AvatarSource.CUSTOM, this.custom()],
+			[AvatarSource.INITIALS, this.initials()],
+			[AvatarSource.VALUE, this.value()]
+		];
+
+		return declared
+			.filter(([sourceType]) => this.avatarService.isSource(sourceType))
+			.reduce<Source[]>((sources, [sourceType, rawValue]) => {
+				const sourceId = this.resolveSourceId(rawValue);
+				if (sourceId) {
+					sources.push(this.sourceFactory.newInstance(sourceType, sourceId));
+				}
+				return sources;
+			}, [])
+			.sort((source1, source2) => this.avatarService.compareSources(source1.sourceType, source2.sourceType));
+	});
+
+	/**
+	 * Cursor into {@link sources}. Linked to the chain so a new chain restarts at its first
+	 * usable entry, while a picture that fails to load — or a fetch that errors — advances it
+	 * by hand. It legitimately sits past the end: that is the "nothing left to try" position.
+	 */
+	private readonly cursor = linkedSignal<Source[], number>({
+		source: () => this.sources(),
+		computation: (sources) => this.nextUsableIndex(sources, 0)
+	});
+
+	/**
+	 * The source painting the avatar right now, and the only place the chain is indexed:
+	 * the cursor sits outside it whenever nothing has resolved, so a raw read yields
+	 * `undefined`. Anything that leaves the component gets the declared `null` instead.
+	 */
+	private readonly currentSource = computed<Source | null>(() => this.sources()[this.cursor()] ?? null);
+
+	/** Picture the network came back with for an {@link AsyncSource}; cleared whenever the cursor moves. */
+	private readonly asyncAvatarSrc = signal<string | null>(null);
+
+	/**
+	 * The picture painted right now — the source's own URL for a plain image source, the
+	 * fetched one for an async source. `null` while the avatar is textual, unresolved, or
+	 * still waiting for that response.
+	 */
+	protected readonly avatarSrc = computed<SafeUrl | null>(() => {
+		const source = this.currentSource();
+		if (!source || this.avatarService.isTextAvatar(source.sourceType)) {
+			return null;
+		}
+
+		return source instanceof AsyncSource
+			? this.asyncAvatarSrc()
+			: this.sanitizer.bypassSecurityTrustUrl(source.getAvatar(+this.size()));
+	});
+
+	/** The initials (or raw value) painted right now; `null` while the avatar is a picture or unresolved. */
+	protected readonly avatarText = computed<string | null>(() => {
+		const source = this.currentSource();
+		return source && this.avatarService.isTextAvatar(source.sourceType) ? source.getAvatar(+this.initialsSize()) : null;
+	});
+
+	/** Inline style of whatever is painted — initials and pictures are dressed differently. */
+	protected readonly avatarStyle = computed<StyleObject>(() => {
+		const source = this.currentSource();
+		if (!source) {
+			return {};
+		}
+
+		return this.avatarService.isTextAvatar(source.sourceType)
+			? this.getInitialsStyle(source.sourceId)
+			: this.getImageStyle();
+	});
+
+	/** Inline size and shape of the avatar container. */
+	protected readonly hostStyle = computed<StyleObject>(() => ({
+		width: this.size() + 'px',
+		height: this.size() + 'px',
+		borderRadius: this.round() ? '50%' : this.cornerRadius() + 'px'
+	}));
+
+	constructor() {
+		// The one step of the chain that cannot be derived: an async source has to leave the
+		// component, comes back later and may never come back at all. Everything else about the
+		// avatar is a function of the inputs and is computed; this bridges that function to the
+		// network, and re-runs whenever the cursor lands on another source.
+		effect(() => {
+			const source = this.currentSource();
+			untracked(() => {
+				this.asyncAvatarSrc.set(null);
+				if (source instanceof AsyncSource) {
+					this.fetchAndProcessAsyncAvatar(source);
+				}
+			});
+		});
+	}
 
 	onAvatarClicked(): void {
-		this.clickOnAvatar.emit(this.sources[this.currentIndex]);
+		this.clickOnAvatar.emit(this.currentSource());
 	}
 
 	/**
@@ -221,15 +334,12 @@ export class AvatarComponent implements AfterContentInit, OnChanges, OnDestroy {
 	}
 
 	/**
-	 * Detects projected content once it is available and, when present, computes its style.
-	 * Runs after content init so `<ng-content>` nodes are already in place.
+	 * Detects projected content once it is available. Runs after content init so the
+	 * `<ng-content>` nodes are already in place; everything downstream derives from the flag.
 	 */
 	ngAfterContentInit(): void {
 		const host = this.customContentRef?.nativeElement;
-		this.hasCustomContent = !!host && this.hasMeaningfulProjectedContent(host);
-		if (this.hasCustomContent) {
-			this.customContentStyle = this.getCustomContentStyle();
-		}
+		this.hasCustomContent.set(!!host && this.hasMeaningfulProjectedContent(host));
 	}
 
 	/**
@@ -272,112 +382,46 @@ export class AvatarComponent implements AfterContentInit, OnChanges, OnDestroy {
 	}
 
 	/**
-	 * Detect inputs change
-	 *
-	 * param {{ [propKey: string]: SimpleChange }} changes
-	 *
-	 * memberof AvatarComponent
+	 * Retires the source painting the avatar and hands over to the next usable one. Bound to
+	 * the image's `(error)`, which is how a picture that never loads gives up its turn.
 	 */
-	ngOnChanges(changes: SimpleChanges): void {
-		for (const propName in changes) {
-			if (this.avatarService.isSource(propName)) {
-				const sourceType: AvatarSource = AvatarSource[propName.toUpperCase() as keyof typeof AvatarSource];
-				const currentValue = changes[propName].currentValue;
-				if (currentValue && typeof currentValue === 'string') {
-					this.addSource(sourceType, currentValue);
-				} else {
-					const sanitized = this.sanitizer.sanitize(SecurityContext.URL, currentValue);
-					if (sanitized) {
-						this.addSource(sourceType, sanitized);
-					} else {
-						this.removeSource(sourceType);
-					}
-				}
-			}
+	fetchAvatarSource(): void {
+		const failedSource = untracked(this.currentSource);
+		if (failedSource) {
+			this.avatarService.markSourceAsFailed(failedSource);
 		}
-		// Reinitialize when any source input changes so fallback order is recalculated.
-		this.initializeAvatar();
-		if (this.hasCustomContent) {
-			this.customContentStyle = this.getCustomContentStyle();
-		}
+
+		this.cursor.set(this.nextUsableIndex(untracked(this.sources), untracked(this.cursor) + 1));
 	}
 
 	/**
-	 * Fetch avatar source
-	 *
-	 * memberOf AvatarComponent
+	 * First index at or after `from` whose source has not already failed, or the chain's
+	 * length when there is none left to try.
 	 */
-	fetchAvatarSource(): void {
-		const previousSource = this.sources[this.currentIndex];
-		if (previousSource) {
-			this.avatarService.markSourceAsFailed(previousSource);
+	private nextUsableIndex(sources: Source[], from: number): number {
+		let index = from;
+		while (index < sources.length && this.avatarService.sourceHasFailedBefore(sources[index])) {
+			index++;
 		}
 
-		const source = this.findNextSource();
-		if (!source) {
-			return;
-		}
-
-		if (this.avatarService.isTextAvatar(source.sourceType)) {
-			this.buildTextAvatar(source);
-			this.avatarSrc = null;
-		} else {
-			this.buildImageAvatar(source);
-		}
+		return index;
 	}
 
-	private findNextSource(): Source | null {
-		while (++this.currentIndex < this.sources.length) {
-			const source = this.sources[this.currentIndex];
-			if (source && !this.avatarService.sourceHasFailedBefore(source)) {
-				return source;
-			}
+	/**
+	 * The id a source input carries, as a plain string. A string is taken as it is; anything
+	 * else — notably the `SafeUrl` a consumer may hand to `src` — is unwrapped through the
+	 * sanitizer, and a value that is absent or unsafe drops its source from the chain.
+	 */
+	private resolveSourceId(rawValue: unknown): string | null {
+		if (rawValue && typeof rawValue === 'string') {
+			return rawValue;
 		}
 
-		return null;
+		return rawValue == null ? null : this.sanitizer.sanitize(SecurityContext.URL, rawValue as SafeValue);
 	}
 
 	ngOnDestroy(): void {
 		this.isAlive = false;
-	}
-
-	/**
-	 * Initialize the avatar component and its fallback system
-	 */
-	private initializeAvatar(): void {
-		const computedBorderRadius = this.round() ? '50%' : this.cornerRadius() + 'px';
-		this.hostStyle = {
-			width: this.size() + 'px',
-			height: this.size() + 'px',
-			borderRadius: computedBorderRadius
-		};
-
-		this.currentIndex = -1;
-		if (this.sources.length > 0) {
-			this.sortAvatarSources();
-			this.fetchAvatarSource();
-		}
-	}
-
-	private sortAvatarSources(): void {
-		this.sources.sort((source1: Source, source2: Source) =>
-			this.avatarService.compareSources(source1.sourceType, source2.sourceType)
-		);
-	}
-
-	private buildTextAvatar(avatarSource: Source): void {
-		this.avatarText = avatarSource.getAvatar(+this.initialsSize());
-		this.avatarStyle = this.getInitialsStyle(avatarSource.sourceId);
-	}
-
-	private buildImageAvatar(avatarSource: Source): void {
-		this.avatarStyle = this.getImageStyle();
-		if (avatarSource instanceof AsyncSource) {
-			this.fetchAndProcessAsyncAvatar(avatarSource);
-		} else {
-			this.avatarSrc = this.sanitizer.bypassSecurityTrustUrl(avatarSource.getAvatar(+this.size()));
-			this.avatarAlt = avatarSource.getAvatar(+this.size());
-		}
 	}
 
 	/**
@@ -482,34 +526,11 @@ export class AvatarComponent implements AfterContentInit, OnChanges, OnDestroy {
 				map((response) => source.processResponse(response, +this.size()))
 			)
 			.subscribe({
-				next: (avatarSrc) => (this.avatarSrc = avatarSrc),
-				error: () => {
-					this.fetchAvatarSource();
-				}
+				// Both land after the pass that would have painted them, so under OnPush nothing
+				// would repaint them — except that both end in a signal write the template depends
+				// on, and that marks the view on its own. Hence no ChangeDetectorRef here.
+				next: (avatarSrc) => this.asyncAvatarSrc.set(avatarSrc),
+				error: () => this.fetchAvatarSource()
 			});
-	}
-
-	/**
-	 * Add avatar source
-	 *
-	 * param sourceType avatar source type e.g facebook,twitter, etc.
-	 * param sourceValue  source value e.g facebookId value, etc.
-	 */
-	private addSource(sourceType: AvatarSource, sourceValue: string): void {
-		const source = this.sources.find((s) => s.sourceType === sourceType);
-		if (source) {
-			source.sourceId = sourceValue;
-		} else {
-			this.sources.push(this.sourceFactory.newInstance(sourceType, sourceValue));
-		}
-	}
-
-	/**
-	 * Remove avatar source
-	 *
-	 * param sourceType avatar source type e.g facebook,twitter, etc.
-	 */
-	private removeSource(sourceType: AvatarSource): void {
-		this.sources = this.sources.filter((source) => source.sourceType !== sourceType);
 	}
 }

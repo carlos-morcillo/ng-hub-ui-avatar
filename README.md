@@ -8,7 +8,11 @@
 
 A universal avatar component for Angular applications that renders avatars from multiple sources (Gravatar, GitHub, Facebook, custom images, initials or plain text) and applies an automatic fallback strategy when a source fails.
 
-> **⚠️ BREAKING CHANGES:** Version 21.1.0 removes the need for public stylesheet imports. Styles are now encapsulated within the component. Please read the [BREAKING_CHANGES.md](./BREAKING_CHANGES.md) file before upgrading.
+> **⚠️ BREAKING CHANGES:** 22.10.0 makes the avatar's render state internal (`avatarSrc`, `avatarText`,
+> `avatarStyle`, `hostStyle`, `hasCustomContent`, `customContentStyle`), drops `ngOnChanges` and widens the
+> `clickOnAvatar` payload to `Source | null`. Earlier notes — 22.7.0 (SCSS moved to `ng-hub-ui-avatar/styles`),
+> 22.3.0 (`status` replaced by `badge` + `badgeColor`) and 21.1.0 (no stylesheet import) — are in
+> [BREAKING_CHANGES.md](./BREAKING_CHANGES.md). Read it before upgrading.
 
 ## Documentation and Live Examples
 
@@ -140,34 +144,37 @@ export class ProfileComponent {}
 
 `<hub-avatar>` is a **standalone** component: import `AvatarComponent` directly into the `imports` of any standalone component (as shown above). No `NgModule` is required.
 
-### Configuration
+### Configuration (`provideAvatar`)
 
-Customise source priority, colour palette or src-cache behaviour with `provideAvatar()`:
-
-```typescript
-import { provideAvatar } from 'ng-hub-ui-avatar';
-import { AvatarSource } from 'ng-hub-ui-avatar';
-
-providers: [
-	provideAvatar({
-		sourcePriorityOrder: [AvatarSource.CUSTOM, AvatarSource.GRAVATAR, AvatarSource.INITIALS],
-		colors: ['#1abc9c', '#3498db', '#9b59b6']
-	})
-];
-```
-
-### Legacy `NgModule` (deprecated)
-
-`AvatarModule` is still exported for backward compatibility and now simply re-exports the standalone component. It is **deprecated** — prefer importing `AvatarComponent` and using `provideAvatar()`.
+`provideAvatar()` customises the source priority order, the colour palette used by initials avatars and the src-cache behaviour.
 
 ```typescript
-import { AvatarModule } from 'ng-hub-ui-avatar'; // deprecated
+import { provideAvatar, AvatarSource } from 'ng-hub-ui-avatar';
 
-@NgModule({
-	imports: [AvatarModule] // AvatarModule.forRoot(config) still works too
-})
-export class FeatureModule {}
+bootstrapApplication(AppComponent, {
+	providers: [
+		provideAvatar({
+			sourcePriorityOrder: [AvatarSource.CUSTOM, AvatarSource.INITIALS],
+			colors: ['#FFB6C1', '#2c3e50', '#95a5a6', '#f39c12', '#1abc9c'],
+			disableSrcCache: false
+		})
+	]
+});
 ```
+
+> **Legacy `NgModule` (deprecated):** `AvatarModule` is still exported for backward compatibility and now only re-exports the standalone component. It is **deprecated** — prefer `AvatarComponent` + `provideAvatar()`. `AvatarModule.forRoot(config)` still works too.
+
+`AvatarConfig` fields:
+
+| Field                 | Type             | Description                                            |
+| --------------------- | ---------------- | ------------------------------------------------------ |
+| `colors`              | `string[]`       | Custom color palette for generated text avatars.       |
+| `sourcePriorityOrder` | `AvatarSource[]` | Custom fallback order across avatar sources.           |
+| `disableSrcCache`     | `boolean`        | Disables the cache for custom (image) source requests. |
+
+`AvatarSource` enum values: `FACEBOOK`, `GRAVATAR`, `GITHUB`, `CUSTOM`, `INITIALS`, `VALUE`.
+
+> Note: `facebookId` is kept as a best-effort compatibility source and may fail depending on external API/privacy restrictions.
 
 ### Examples
 
@@ -189,6 +196,16 @@ export class FeatureModule {}
 	size="100"
 	[round]="true"
 ></hub-avatar>
+```
+
+### Clickable avatars
+
+`clickOnAvatar` fires on click alone, which leaves keyboard and screen-reader users with no way to
+trigger it. Add `interactive` and the container becomes a real control: `role="button"`, reachable
+with Tab, activated with Enter or Space.
+
+```html
+<hub-avatar name="John Doe" interactive (clickOnAvatar)="openProfile($event)"></hub-avatar>
 ```
 
 ### Custom content (icons, SVG, images)
@@ -213,40 +230,6 @@ Project any content directly inside `<hub-avatar>` — an icon from any library,
 
 It activates automatically whenever content is projected and takes precedence over the image/initials sources. The circle uses the avatar's own background (`--hub-avatar-bg-color`, the design-system accent by default) with a white foreground, so it reads as a coloured circle out of the box. Theme it with the regular `bgColor` / `fgColor` / `borderColor` inputs, and tune the sizing with the `--hub-avatar-content-*` tokens (see [Styling](#styling)).
 
-### Module configuration (`forRoot`)
-
-`AvatarModule.forRoot()` allows overriding module-level behavior.
-
-```typescript
-import { AvatarModule, AvatarSource } from 'ng-hub-ui-avatar';
-
-const avatarSourcesOrder = [AvatarSource.CUSTOM, AvatarSource.INITIALS];
-const avatarColors = ['#FFB6C1', '#2c3e50', '#95a5a6', '#f39c12', '#1abc9c'];
-
-@NgModule({
-	imports: [
-		AvatarModule.forRoot({
-			sourcePriorityOrder: avatarSourcesOrder,
-			colors: avatarColors,
-			disableSrcCache: false
-		})
-	]
-})
-export class AppModule {}
-```
-
-`AvatarConfig` fields:
-
-| Field                 | Type             | Description                                              |
-| --------------------- | ---------------- | -------------------------------------------------------- |
-| `colors`              | `string[]`       | Custom color palette for generated text avatars.        |
-| `sourcePriorityOrder` | `AvatarSource[]` | Custom fallback order across avatar sources.             |
-| `disableSrcCache`     | `boolean`        | Disables the cache for custom (image) source requests.   |
-
-`AvatarSource` enum values: `FACEBOOK`, `GRAVATAR`, `GITHUB`, `CUSTOM`, `INITIALS`, `VALUE`.
-
-> Note: `facebookId` is kept as a best-effort compatibility source and may fail depending on external API/privacy restrictions.
-
 ## API Reference
 
 ### Inputs
@@ -266,11 +249,13 @@ export class AppModule {}
 | `round`          | `boolean`                       | `true`      | Enables circular shape                         |
 | `cornerRadius`   | `number \| string`              | `0`         | Radius in px when `round` is `false`           |
 | `bgColor`        | `string`                        | `undefined` | Background color override                      |
+| `autoColor`      | `boolean`                       | `true`      | Derives the initials background from a hash of `name` and applies it inline. Set to `false` to theme the avatar through `--hub-avatar-bg-color`; an explicit `bgColor` always wins. |
 | `fgColor`        | `string`                        | `#FFF`      | Foreground/text color                          |
 | `borderColor`    | `string`                        | `undefined` | Border color (applies a 1px solid border)      |
-| `style`          | `Record<string, any> \| string` | `{}`        | Custom inline styles merged into avatar styles |
+| `style`          | `Record<string, string \| number \| null \| undefined> \| string` | `{}` | Inline styles merged into the rendered content — the image, the initials or the projected-content slot. A CSS string (`'border: 1px solid red'`) is parsed. It never reaches the host element. |
 | `placeholder`    | `string`                        | `undefined` | Reserved placeholder input                     |
 | `referrerpolicy` | `string \| null`                | `undefined` | Referrer policy for avatar image requests      |
+| `interactive`    | `boolean`                       | `false`     | Turns the avatar into a control: `role="button"`, focusable, and Enter/Space emit `clickOnAvatar`. Enable it whenever you bind that output. |
 | `badge`          | `string \| number \| boolean \| null` | `null` | Corner overlay. `badge` / `[badge]="true"` → a **dot**; `badge="4k"` / `[badge]="9"` → a **labelled** pill; `null` / absent → nothing. |
 | `badgeColor`     | `HubAvatarBadgeColor \| string \| null` | `null` | Semantic colour of the badge: `primary · secondary · success · danger · warning · info · light · dark` (→ `--hub-sys-color-*`). Any custom string also works (set `--hub-avatar-badge-color`). |
 
@@ -278,15 +263,30 @@ export class AppModule {}
 
 ### Outputs
 
-| Output          | Type                   | Description                                                              |
-| --------------- | ---------------------- | ----------------------------------------------------------------------- |
-| `clickOnAvatar` | `EventEmitter<Source>` | Fired on avatar click with the source used to render the current avatar |
+| Output          | Type                               | Description                                                                             |
+| --------------- | ---------------------------------- | --------------------------------------------------------------------------------------- |
+| `clickOnAvatar` | `OutputEmitterRef<Source \| null>` | Fired on click, and on Enter/Space when `interactive` is set, with the source painting the avatar |
+
+`Source` is exported from the package, so the handler can be typed:
+
+```ts
+import { Source } from 'ng-hub-ui-avatar';
+
+onAvatarClick(source: Source | null): void { ... }
+```
 
 The emitted `Source` payload exposes:
 
 - `sourceType`: source type (`facebook`, `gravatar`, `github`, `custom`, `initials`, `value`).
 - `sourceId`: identifier used by that source.
 - `getAvatar(size)`: function that resolves the avatar URL/value.
+
+The payload is `null` when no source is painting the avatar: one built from projected content
+alone, or one whose whole fallback chain has failed. The click still fires — only the source is
+missing.
+
+A bare `(clickOnAvatar)` binding is mouse-only. Add [`interactive`](#clickable-avatars) so the avatar
+is focusable and answers Enter/Space too.
 
 ## Styling
 

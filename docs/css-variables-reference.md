@@ -30,15 +30,19 @@ This allows:
 
 ## Importing Styles
 
-Starting from version 21.1.0, you don't need to import a global stylesheet. The styles are now strictly encapsulated within `HubAvatarComponent`.
+Since 21.1.0 there is no stylesheet to import: the component carries its own styles, and everything
+in this reference is themed by setting the tokens on `hub-avatar` (or on any ancestor).
 
-If you were previously using:
+The package still ships SCSS, but only the theming mixins, and since 22.7.0 they live at
+`ng-hub-ui-avatar/styles` (the old `ng-hub-ui-avatar/src/lib/styles/...` path no longer resolves):
 
 ```scss
-@use 'ng-hub-ui-avatar/src/lib/styles/avatar.scss';
-```
+@use 'ng-hub-ui-avatar/styles' as avatar;
 
-You can now remove this import. The component handles its own styling automatically.
+hub-avatar.brand {
+  @include avatar.hub-avatar-theme($bg: #ede9fe, $fg: #5b21b6);
+}
+```
 
 ---
 
@@ -51,19 +55,22 @@ You can now remove this import. The component handles its own styling automatica
 | `--hub-ref-color-white` | `#fff` |
 | `--hub-ref-radius-sm` | `0.25rem` |
 | `--hub-ref-border-width` | `1px` |
-| `--hub-ref-font-family-base` | `Helvetica, Arial, sans-serif` |
+| `--hub-ref-font-family-base` | `system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif` |
 | `--hub-sys-surface-page` | `#fff` |
 | `--hub-sys-text-primary` | `#212529` |
 | `--hub-sys-text-muted` | `#6c757d` |
-| `--hub-sys-color-success` | — (status `online`) |
-| `--hub-sys-color-warning` | — (status `away`) |
-| `--hub-sys-color-danger` | — (status `busy`) |
+| `--hub-sys-color-primary` | — (default avatar accent) |
+| `--hub-sys-color-secondary` | — (default badge fill) |
+| `--hub-sys-color-success` | — (`badgeColor="success"`) |
+| `--hub-sys-color-warning` | — (`badgeColor="warning"`) |
+| `--hub-sys-color-danger` | — (`badgeColor="danger"`) |
+| `--hub-sys-color-ink` | `#212529` (accent emphasis mix) |
 
 ---
 
 ## Avatar Variables
 
-Defined and consumed by `projects/avatar/src/lib/styles/avatar.scss`.
+Defined and consumed by `projects/avatar/src/lib/avatar.component.scss`.
 
 ### Core
 
@@ -72,6 +79,19 @@ Defined and consumed by `projects/avatar/src/lib/styles/avatar.scss`.
 | `--hub-avatar-size` | `50px` (runtime) | Avatar width/height — **written from the `size` input**; override the input, not this variable (the inline host style wins) |
 | `--hub-avatar-overflow` | `hidden` | Overflow clipping behavior |
 | `--hub-avatar-object-fit` | `cover` | Image content fit |
+
+### Accent
+
+One slot drives the avatar's colour: re-base `--hub-avatar-accent` and the fill and a legible
+foreground follow. This is what the `.hub-avatar--<colour>` variants and the
+`hub-avatar-color-variants()` mixin write, so a custom colour needs no other rule.
+
+| Variable | Default | Usage |
+| --- | --- | --- |
+| `--hub-avatar-accent` | `var(--hub-sys-color-primary, #0d6efd)` | The avatar's accent colour — the single slot every variant re-bases |
+| `--hub-avatar-accent-emphasis` | `color-mix(in oklch, var(--hub-avatar-accent) 80%, var(--hub-sys-color-ink, #212529))` | Darkened accent, derived locally |
+| `--hub-avatar-accent-subtle` | `color-mix(in oklch, var(--hub-avatar-accent) 12%, var(--hub-sys-surface-page, #fff))` | Tinted accent, derived locally |
+| `--hub-avatar-accent-on` | `oklch(from var(--hub-avatar-accent) clamp(0, (0.62 - l) * 1000, 1) 0 h)` | Contrast flip on the accent — feeds `--hub-avatar-fg-color`, so light accents get dark text |
 
 ### Shape and Border
 
@@ -138,8 +158,8 @@ Applied when avatars are wrapped in a `.hub-avatar-group` to overlap them; each 
 ### Framework-Agnostic
 
 ```scss
+/* size and shape come from the [size] / [round] / [cornerRadius] inputs */
 hub-avatar {
-  --hub-avatar-size: 64px;
   --hub-avatar-border-radius: 16px;
   --hub-avatar-fg-color: #ffffff;
   --hub-avatar-bg-color: #0d6efd;
@@ -160,9 +180,13 @@ hub-avatar {
 
 ### Compact Avatar
 
+```html
+<hub-avatar name="Jane Doe" size="32" class="compact"></hub-avatar>
+```
+
 ```scss
 hub-avatar.compact {
-  --hub-avatar-size: 32px;
+  /* the size itself is the [size] input; the tokens dress what it renders */
   --hub-avatar-font-size: 11px;
 }
 ```

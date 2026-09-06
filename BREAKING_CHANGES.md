@@ -2,6 +2,52 @@
 
 This document details the breaking changes introduced in major versions of `ng-hub-ui-avatar` and how to migrate your codebase.
 
+## [22.10.0] - 2026-09-06
+### The avatar's render state is internal, and `ngOnChanges` is gone
+
+- **Change**: `avatarSrc`, `avatarText`, `avatarStyle`, `hostStyle`, `hasCustomContent` and
+  `customContentStyle` were public mutable fields holding what the component had just painted.
+  They are now `protected` signals derived from the inputs, and the component no longer implements
+  `OnChanges` — the fallback chain is computed instead of patched from `SimpleChanges`.
+- **Impact**: reading any of those fields off a `ViewChild`-ed `AvatarComponent` no longer compiles,
+  and neither does calling `avatar.ngOnChanges(...)` by hand (a test double driving the component
+  that way is the likely place this shows up). Nothing changes for a template that only binds inputs
+  and listens to `clickOnAvatar`, which is every documented use.
+- **Migration**: read the inputs you passed in, not the state the avatar derived from them. A test
+  that used to call `ngOnChanges` to make a change land should set the input and let change detection
+  run:
+
+    ```ts
+    // Before
+    fixture.componentRef.setInput('name', 'John Doe');
+    component.ngOnChanges({ initials: new SimpleChange(null, 'John Doe', true) });
+    fixture.detectChanges();
+
+    // After
+    fixture.componentRef.setInput('name', 'John Doe');
+    fixture.detectChanges();
+    ```
+
+### `clickOnAvatar` emits `Source | null`
+
+- **Change**: the output payload is now `Source | null`. It was typed `Source` but could hand you
+  `undefined` — an avatar built from projected content alone has no source, and neither has one
+  whose whole fallback chain failed.
+- **Impact**: with `strictTemplates`, a handler declared `(source: Source)` no longer accepts
+  `$event`. Nothing changes at runtime except that the two cases above now arrive as `null`.
+- **Migration**: widen the handler and read the source through the null check.
+
+    ```ts
+    import { Source } from 'ng-hub-ui-avatar'; // now exported from the entry point
+
+    onAvatarClick(source: Source | null): void {
+    	if (!source) {
+    		return;
+    	}
+    	console.log(source.sourceType);
+    }
+    ```
+
 ## [22.7.0] - 2026-07-07
 
 ### SCSS ships at `ng-hub-ui-avatar/styles` (packaging path)

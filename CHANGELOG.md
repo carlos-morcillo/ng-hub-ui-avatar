@@ -2,6 +2,86 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.10.0] - 2026-09-06
+
+### Added
+
+- **`Source` is part of the public API.** The interface that types the `clickOnAvatar` payload
+  lived only inside the package, so nobody could name the type of their own handler: the choice
+  was `any` or a hand-copied duplicate that drifts the moment the real one changes. It is a type,
+  so re-exporting it from the entry point costs nothing at runtime.
+
+### Changed
+
+- **`clickOnAvatar` emits `Source | null`, not `Source`.** The payload was read from a cursor into
+  the fallback list, and that cursor legitimately sits outside it: at `-1` until something resolves
+  — an avatar drawn from projected content alone never leaves it — and past the last entry once
+  every source has failed. Clicking in either state handed the consumer `undefined` through an
+  output that promised a `Source`, so a handler reading `$event.sourceType` threw. The absence is
+  now declared instead of leaked and the click still fires; a handler typed `(source: Source)` has
+  to widen. See `BREAKING_CHANGES.md`.
+
+- **`<hub-avatar>` runs on `OnPush`.** It was the last component in the family still checked on every
+  tick of the application, so a consumer who put an avatar inside an `OnPush` tree paid for that check
+  and got nothing from it. What the template reads is derived from the inputs, so it marks the view on
+  its own — see the entry below, which is what made the strategy safe to switch.
+
+- **The avatar is derived from its inputs instead of patched from `SimpleChanges`.** The fallback
+  chain was rebuilt by hand in `ngOnChanges`, one entry added or removed per changed property, and
+  everything it produced — the resolved picture, the initials, their inline styles — was parked in
+  mutable fields. But the chain is a function of the source inputs, so it is computed from them now;
+  the cursor that walks it is linked to it, and what gets painted derives from wherever that cursor
+  sits. The `ChangeDetectorRef` went with it: the template reads signals, and those mark the view on
+  their own. Dependencies arrive through `inject()`. The render state the component used to expose as
+  public fields is now internal — see `BREAKING_CHANGES.md`.
+
+### Fixed
+
+- **Clearing the last source input now clears the avatar.** Unsetting `name` (or `src`, or any other
+  source) dropped the source from the fallback chain and stopped there: with nothing left to resolve,
+  nothing repainted, and the initials or the picture of the value that had just been removed stayed
+  on screen until some other source arrived. A list rendering avatars for a selection would keep
+  showing the person who had just been deselected.
+
+- **The avatar image is named after the person, not after the URL it came from.** The `alt`
+  fell back to the resolved source, so a Gravatar, Facebook or custom picture without an explicit
+  `alt` made a screen reader read the whole address aloud, and an image resolved asynchronously
+  (GitHub) shipped with no `alt` at all or with the address a previous source had left behind.
+  The accessible name now comes from `alt` when given, from `name` otherwise, and stays empty
+  when there is neither — an avatar nobody named is decorative, and silence beats a URL.
+
+- **The manifest now exports the stylesheet paths the documentation teaches.** The tarball has always
+  carried `styles/index.scss` and `styles/mixins/_avatar-theme.scss`, but the generated `exports` map
+  listed only the package entry point, so anything under `styles/` was formally private. The Angular
+  CLI happens not to notice — its Sass integration falls back to resolving the package root and joins
+  the rest of the path by hand — yet every resolver that honours the map (webpack's `sass-loader`,
+  dart-sass's `pkg:` importer) refuses `@use 'ng-hub-ui-avatar/styles'` outright. Declaring `./styles`
+  and `./styles/mixins/avatar-theme` makes the published surface match what the README, the docs page
+  and `BREAKING_CHANGES.md` tell consumers to write, and aligns the package with `ng-hub-ui-ds`, which
+  already lists its stylesheet subpaths. Packaging metadata only — no code, no types, no styles change.
+
+- **The documentation now describes the component that exists.** Two inputs shipped without ever
+  reaching the reference — `autoColor` (22.6.0) and `interactive` (22.8.0) — so the only way to
+  discover that a clickable avatar can be reached with the keyboard, or that the initials background
+  can be freed for theming, was to read the source. `clickOnAvatar` was typed `EventEmitter` although
+  it is built with `output()`, `style` was described as landing on the avatar's root element although
+  it is merged into the rendered content, and the breaking-changes banner still pointed at 21.1.0
+  with three later migrations behind it. The English and Spanish READMEs had also drifted apart into
+  different section structures, one of them teaching `AvatarModule.forRoot()` as a live API rather
+  than the deprecated shim it is.
+
+- **`FUNCTIONALITIES.md` stops reporting a `status` input.** It was renamed to `badge` + `badgeColor`
+  in 22.3.0, and the table still listed presence rows under the old name while saying nothing about
+  the keyboard activation, the hash-colour opt-out, the projected content, the colour variants or the
+  theming mixin.
+
+- **`docs/css-variables-reference.md` points at a stylesheet that exists.** It named
+  `src/lib/styles/avatar.scss`, removed in 21.1.0, taught the SCSS import path that 22.7.0 replaced,
+  labelled the semantic colours as `status` values, and offered two theming examples built on
+  overriding `--hub-avatar-size` — which cannot work, because the host writes that token inline from
+  the `size` input. The four `--hub-avatar-accent*` tokens, which are the whole colour engine, were
+  missing.
+
 ## [22.9.3] - 2026-09-01
 
 ### Changed
@@ -34,7 +114,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- **NEW peer dependency: `ng-hub-ui-utils` `>=22.7.0`.** Consumers must have `ng-hub-ui-utils` installed alongside this library (it is where `resolveHubAccent` lives). Users installing via `ng add ng-hub-ui-installer` get it automatically; manual installs need `npm i ng-hub-ui-utils`.
+- **NEW peer dependency: `ng-hub-ui-utils` `>=22.7.0`.** Consumers must have `ng-hub-ui-utils` installed alongside this library (it is where `resolveHubAccent` lives). Users installing via `ng add ng-hub-ui` get it automatically; manual installs need `npm i ng-hub-ui-utils`.
 
 ## [22.8.0] - 2026-07-28
 

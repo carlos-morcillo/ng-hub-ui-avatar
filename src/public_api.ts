@@ -7,3 +7,4 @@ export * from './lib/avatar.module';
 export * from './lib/avatar.providers';
 export * from './lib/avatar.service';
 export * from './lib/sources/avatar-source.enum';
+export * from './lib/sources/source';
