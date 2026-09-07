@@ -73,12 +73,22 @@ export type HubAvatarBadgeColor = 'primary' | 'secondary' | 'success' | 'danger'
 						class="avatar-content"
 						loading="lazy"
 					/>
-				} @else {
-					@if (avatarText(); as text) {
-						<div class="avatar-content" [style]="avatarStyle()">
-							{{ text }}
-						</div>
-					}
+				} @else if (avatarText(); as text) {
+					<div class="avatar-content" [style]="avatarStyle()">
+						{{ text }}
+					</div>
+				} @else if (placeholderSrc(); as src) {
+					<img
+						[src]="src"
+						[alt]="avatarAlt()"
+						[width]="size()"
+						[height]="size()"
+						[style]="placeholderStyle()"
+						[referrerPolicy]="referrerpolicy()"
+						(error)="onPlaceholderError()"
+						class="avatar-content hub-avatar__placeholder"
+						loading="lazy"
+					/>
 				}
 			}
 		</div>
@@ -133,6 +143,17 @@ export class AvatarComponent implements AfterContentInit, OnDestroy {
 	readonly initials = input<string | null>(undefined, { alias: 'name' });
 	readonly value = input<string | null>();
 	readonly referrerpolicy = input<string | null>();
+	/**
+	 * Picture of last resort: the URL painted while the avatar has nothing else to show —
+	 * every declared source failed, none was declared at all, or an async one has not
+	 * answered yet — and there are no initials to fall back on either. Without it the
+	 * avatar renders an empty circle, which reads as a layout bug rather than as a missing
+	 * person.
+	 *
+	 * It is deliberately NOT a source: it never joins the fallback chain, so it cannot
+	 * outrank the initials the way handing the same URL to `src` would. A placeholder that
+	 * fails to load is dropped rather than retried, because there is nothing after it.
+	 */
 	readonly placeholder = input<string>();
 	readonly initialsSize = input<string | number>(0);
 	/**
@@ -280,6 +301,28 @@ export class AvatarComponent implements AfterContentInit, OnDestroy {
 		return source && this.avatarService.isTextAvatar(source.sourceType) ? source.getAvatar(+this.initialsSize()) : null;
 	});
 
+	/**
+	 * Whether the {@link placeholder} itself failed to load. Linked to the input so a
+	 * replacement gets its own chance; without the flag the browser re-requests the same
+	 * dead URL on every error, because the error handler is what re-renders the image.
+	 */
+	private readonly placeholderFailed = linkedSignal<string | undefined, boolean>({
+		source: () => this.placeholder(),
+		computation: () => false
+	});
+
+	/** The placeholder to paint, or `null` when something else is painting or it has failed. */
+	protected readonly placeholderSrc = computed<string | null>(() => {
+		if (this.avatarSrc() || this.avatarText() || this.placeholderFailed()) {
+			return null;
+		}
+
+		return this.placeholder() || null;
+	});
+
+	/** The placeholder is dressed as any other picture, so it lands where a real avatar would. */
+	protected readonly placeholderStyle = computed<StyleObject>(() => this.getImageStyle());
+
 	/** Inline style of whatever is painted — initials and pictures are dressed differently. */
 	protected readonly avatarStyle = computed<StyleObject>(() => {
 		const source = this.currentSource();
@@ -392,6 +435,15 @@ export class AvatarComponent implements AfterContentInit, OnDestroy {
 		}
 
 		this.cursor.set(this.nextUsableIndex(untracked(this.sources), untracked(this.cursor) + 1));
+	}
+
+	/**
+	 * Retires a broken placeholder. Bound to the placeholder image's `(error)`: there is no
+	 * further fallback, so the avatar goes back to painting nothing rather than looping on
+	 * a URL that has already answered once with a failure.
+	 */
+	protected onPlaceholderError(): void {
+		this.placeholderFailed.set(true);
 	}
 
 	/**

@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.11.0] - 2026-09-07
+
+### Added
+
+- **`placeholder` finally paints something.** The input had been declared since the component
+  was written and nothing read it — not the component, not its template, not the service — so an
+  avatar with no source and no initials rendered an empty circle while both READMEs listed the
+  input as "reserved". It now holds the picture of last resort: painted only while nothing else
+  is (no source resolved, none declared, or an async one still loading) and there are no initials
+  to fall back on. It is deliberately **not** a source and never joins the fallback chain, so
+  declaring it cannot outrank the initials the way handing the same URL to `src` does. A
+  placeholder that itself fails to load is dropped rather than retried, because there is nothing
+  after it. The image carries `hub-avatar__placeholder` alongside `avatar-content`, so a
+  placeholder can be dressed differently from a real picture.
+
 ## [22.10.0] - 2026-09-06
 
 ### Added

@@ -15,6 +15,7 @@ This table details the functionalities of the `ng-hub-ui-avatar` library and ind
 | | Referrer policy on image requests (`referrerpolicy`) | ❌ |
 | | Projected custom content (icon / SVG / image / emoji) | ✅ |
 | **Fallback System** | Multiple Source Fallback | ✅ |
+| | Placeholder of last resort (`placeholder`) | ❌ |
 | **Sizing** | Custom Size (`size`) | ✅ |
 | | Text Size Ratio (`textSizeRatio`) | ✅ |
 | | Initials Size Limit (`initialsSize`) | ✅ |

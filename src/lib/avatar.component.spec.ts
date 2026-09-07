@@ -316,4 +316,64 @@ describe('AvatarComponent', () => {
 			expect(payload).toBeNull();
 		});
 	});
+	// TD-140 — `placeholder` was declared and read nowhere, so an avatar with nothing left to
+	// paint rendered an empty circle while the input sat in both READMEs. These hold the
+	// contract it now has: last resort, never a source, and it gives up quietly when it breaks.
+	describe('placeholder', () => {
+		const placeholderImg = () => fixture.debugElement.query(By.css('img.hub-avatar__placeholder'));
+
+		it('paints the placeholder when nothing else resolves', () => {
+			fixture.componentRef.setInput('placeholder', 'https://cdn.example/anonymous.png');
+			fixture.detectChanges();
+
+			expect(placeholderImg()).not.toBeNull();
+			expect(placeholderImg().nativeElement.src).toBe('https://cdn.example/anonymous.png');
+		});
+
+		it('renders nothing at all when no placeholder is given', () => {
+			fixture.detectChanges();
+
+			expect(fixture.debugElement.query(By.css('.avatar-container img'))).toBeNull();
+		});
+
+		it('stays out of the fallback chain, so a resolved source still wins', () => {
+			fixture.componentRef.setInput('placeholder', 'https://cdn.example/anonymous.png');
+			fixture.componentRef.setInput('name', 'John Doe');
+			fixture.detectChanges();
+
+			expect(placeholderImg()).toBeNull();
+			expect(fixture.debugElement.query(By.css('div.avatar-content')).nativeElement.textContent.trim()).toBe('JD');
+		});
+
+		it('takes over once every declared source has failed', () => {
+			vi.spyOn(avatarService, 'sourceHasFailedBefore').mockReturnValue(true);
+			fixture.componentRef.setInput('placeholder', 'https://cdn.example/anonymous.png');
+			fixture.componentRef.setInput('gravatarId', 'invalid@example.com');
+			fixture.detectChanges();
+
+			expect(placeholderImg()).not.toBeNull();
+		});
+
+		it('gives up when the placeholder itself fails to load, instead of retrying it forever', () => {
+			fixture.componentRef.setInput('placeholder', 'https://cdn.example/missing.png');
+			fixture.detectChanges();
+
+			placeholderImg().triggerEventHandler('error', new Event('error'));
+			fixture.detectChanges();
+
+			expect(placeholderImg()).toBeNull();
+		});
+
+		it('gives a replacement placeholder its own chance after one failed', () => {
+			fixture.componentRef.setInput('placeholder', 'https://cdn.example/missing.png');
+			fixture.detectChanges();
+			placeholderImg().triggerEventHandler('error', new Event('error'));
+			fixture.detectChanges();
+
+			fixture.componentRef.setInput('placeholder', 'https://cdn.example/anonymous.png');
+			fixture.detectChanges();
+
+			expect(placeholderImg()).not.toBeNull();
+		});
+	});
 });

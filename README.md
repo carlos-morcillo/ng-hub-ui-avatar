@@ -253,7 +253,7 @@ It activates automatically whenever content is projected and takes precedence ov
 | `fgColor`        | `string`                        | `#FFF`      | Foreground/text color                          |
 | `borderColor`    | `string`                        | `undefined` | Border color (applies a 1px solid border)      |
 | `style`          | `Record<string, string \| number \| null \| undefined> \| string` | `{}` | Inline styles merged into the rendered content — the image, the initials or the projected-content slot. A CSS string (`'border: 1px solid red'`) is parsed. It never reaches the host element. |
-| `placeholder`    | `string`                        | `undefined` | Reserved placeholder input                     |
+| `placeholder`    | `string`                        | `undefined` | Picture of last resort, painted only while nothing else is: no source resolved, none declared, or one still loading, and no initials either. It is not a source and never joins the fallback chain, so it cannot outrank the initials the way `src` would. A placeholder that fails to load is dropped, not retried. The image carries `hub-avatar__placeholder` alongside `avatar-content`. |
 | `referrerpolicy` | `string \| null`                | `undefined` | Referrer policy for avatar image requests      |
 | `interactive`    | `boolean`                       | `false`     | Turns the avatar into a control: `role="button"`, focusable, and Enter/Space emit `clickOnAvatar`. Enable it whenever you bind that output. |
 | `badge`          | `string \| number \| boolean \| null` | `null` | Corner overlay. `badge` / `[badge]="true"` → a **dot**; `badge="4k"` / `[badge]="9"` → a **labelled** pill; `null` / absent → nothing. |
