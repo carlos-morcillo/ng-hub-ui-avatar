@@ -2,6 +2,49 @@
 
 This document details the breaking changes introduced in major versions of `ng-hub-ui-avatar` and how to migrate your codebase.
 
+## [22.12.0] - 2026-09-08
+
+### `AvatarComponent` and `AvatarService` are renamed
+
+- **Change**: the component class is `HubAvatarComponent` and the injectable is
+  `HubAvatarService`. Both old names stay exported as `@deprecated` aliases of the very same
+  classes, and both are removed in **23.0.0**, the release that moves this family to Angular 23.
+  `AvatarModule` is untouched — it is already announced for removal in that same release, so
+  renaming it would create a symbol born deprecated.
+
+- **Why**: `AvatarComponent` is a name in the consumer's namespace, not in ours. An application
+  with users tends to grow an avatar component of its own, and the day it does, the two names
+  collide in whichever file imports both — and the only way out is an alias on our side of the
+  line, for a name this package never had the right to claim. Every other class in the family
+  already carries the prefix; these two were the leftovers.
+
+- **What happens if you do nothing**: today, nothing at all. `import { AvatarComponent } from
+  'ng-hub-ui-avatar'` still compiles, `imports: [AvatarComponent]` still works, and
+  `inject(AvatarService)` still returns the same singleton, because each alias resolves to the class
+  it renames. Your editor will mark them struck through, which is the warning. In 23.0.0 both
+  disappear from the entry point and those imports stop compiling — loudly, at build time.
+
+- **Migration**: rename the imports. Nothing else moves: same `<hub-avatar>` selector, same inputs,
+  same outputs, same configuration through `provideAvatar()`.
+
+    ```ts
+    // Before
+    import { AvatarComponent, AvatarService } from 'ng-hub-ui-avatar';
+
+    @Component({ imports: [AvatarComponent] })
+    export class ProfileComponent {
+    	private readonly avatars = inject(AvatarService);
+    }
+
+    // After
+    import { HubAvatarComponent, HubAvatarService } from 'ng-hub-ui-avatar';
+
+    @Component({ imports: [HubAvatarComponent] })
+    export class ProfileComponent {
+    	private readonly avatars = inject(HubAvatarService);
+    }
+    ```
+
 ## [22.11.1] - 2026-09-08
 
 ### Announced: `AvatarModule` is removed in 23.0.0
@@ -22,7 +65,7 @@ This document details the breaking changes introduced in major versions of `ng-h
 export class AppModule {}
 
 // After
-@Component({ imports: [AvatarComponent] })
+@Component({ imports: [HubAvatarComponent] })
 export class ProfileComponent {}
 
 bootstrapApplication(App, { providers: [provideAvatar({ colors: ['#1abc9c'] })] });

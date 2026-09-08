@@ -19,7 +19,7 @@ import {
 
 import { DomSanitizer, SafeUrl, SafeValue } from '@angular/platform-browser';
 import { map, takeWhile } from 'rxjs/operators';
-import { AvatarService } from './avatar.service';
+import { HubAvatarService } from './avatar.service';
 import { AsyncSource } from './sources/async-source';
 import { AvatarSource } from './sources/avatar-source.enum';
 import { resolveHubAccent } from 'ng-hub-ui-utils';
@@ -108,9 +108,9 @@ export type HubAvatarBadgeColor = 'primary' | 'secondary' | 'success' | 'danger'
 		'[style.--hub-avatar-size]': 'avatarSizePx'
 	}
 })
-export class AvatarComponent implements AfterContentInit, OnDestroy {
+export class HubAvatarComponent implements AfterContentInit, OnDestroy {
 	private readonly sourceFactory = inject(SourceFactory);
-	private readonly avatarService = inject(AvatarService);
+	private readonly avatarService = inject(HubAvatarService);
 	private readonly sanitizer = inject(DomSanitizer);
 
 	readonly round = input(true);
@@ -480,7 +480,7 @@ export class AvatarComponent implements AfterContentInit, OnDestroy {
 	 *
 	 * returns initials style
 	 *
-	 * memberOf AvatarComponent
+	 * memberOf HubAvatarComponent
 	 */
 	private getInitialsStyle(avatarValue: string): StyleObject {
 		const borderColor = this.borderColor();
@@ -512,7 +512,7 @@ export class AvatarComponent implements AfterContentInit, OnDestroy {
 	 *
 	 * returns image style
 	 *
-	 * memberOf AvatarComponent
+	 * memberOf HubAvatarComponent
 	 */
 	private getImageStyle(): StyleObject {
 		const borderColor = this.borderColor();
@@ -564,7 +564,7 @@ export class AvatarComponent implements AfterContentInit, OnDestroy {
 	 * Fetch avatar image asynchronously.
 	 *
 	 * param {Source} source represents avatar source
-	 * memberof AvatarComponent
+	 * memberof HubAvatarComponent
 	 */
 	private fetchAndProcessAsyncAvatar(source: AsyncSource): void {
 		if (this.avatarService.sourceHasFailedBefore(source)) {

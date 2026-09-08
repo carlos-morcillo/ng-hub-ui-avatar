@@ -4,9 +4,9 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { Observable, Subject, of, throwError } from 'rxjs';
-import { AvatarComponent } from './avatar.component';
+import { HubAvatarComponent } from './avatar.component';
 import { AvatarModule } from './avatar.module';
-import { AvatarService } from './avatar.service';
+import { HubAvatarService } from './avatar.service';
 import { AvatarSource } from './sources/avatar-source.enum';
 import { Source } from './sources/source';
 import { SourceFactory } from './sources/source.factory';
@@ -48,20 +48,20 @@ class AvatarServiceMock {
 	}
 }
 
-describe('AvatarComponent', () => {
-	let component: AvatarComponent;
-	let fixture: ComponentFixture<AvatarComponent>;
-	let avatarService: AvatarService;
+describe('HubAvatarComponent', () => {
+	let component: HubAvatarComponent;
+	let fixture: ComponentFixture<HubAvatarComponent>;
+	let avatarService: HubAvatarService;
 
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
 			imports: [AvatarModule],
-			providers: [SourceFactory, provideHttpClientTesting(), { provide: AvatarService, useClass: AvatarServiceMock }]
+			providers: [SourceFactory, provideHttpClientTesting(), { provide: HubAvatarService, useClass: AvatarServiceMock }]
 		}).compileComponents();
 
-		fixture = TestBed.createComponent(AvatarComponent);
+		fixture = TestBed.createComponent(HubAvatarComponent);
 		component = fixture.componentInstance;
-		avatarService = TestBed.inject(AvatarService);
+		avatarService = TestBed.inject(HubAvatarService);
 		fixture.detectChanges();
 	});
 
@@ -100,7 +100,7 @@ describe('AvatarComponent', () => {
 	describe('projected content', () => {
 		@Component({
 			standalone: true,
-			imports: [AvatarComponent],
+			imports: [HubAvatarComponent],
 			template: `<hub-avatar name="John Doe" bgColor="#123456"><i class="icon"></i></hub-avatar>`
 		})
 		class ProjectedContentHostComponent {}

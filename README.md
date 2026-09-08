@@ -8,9 +8,12 @@
 
 A universal avatar component for Angular applications that renders avatars from multiple sources (Gravatar, GitHub, Facebook, custom images, initials or plain text) and applies an automatic fallback strategy when a source fails.
 
-> **⚠️ BREAKING CHANGES:** 22.11.1 announces that `AvatarModule` and `AvatarModule.forRoot()` are
+> **⚠️ BREAKING CHANGES:** 22.12.0 renames `AvatarComponent` to `HubAvatarComponent` and
+> `AvatarService` to `HubAvatarService`; the old names stay as deprecated aliases of the same
+> classes and are removed in 23.0.0, so nothing breaks today.
+> 22.11.1 announces that `AvatarModule` and `AvatarModule.forRoot()` are
 > removed in 23.0.0, the next version that tracks a new Angular major — nothing changes at runtime yet,
-> and the migration is `AvatarComponent` plus `provideAvatar()`.
+> and the migration is `HubAvatarComponent` plus `provideAvatar()`.
 > 22.10.0 makes the avatar's render state internal (`avatarSrc`, `avatarText`,
 > `avatarStyle`, `hostStyle`, `hasCustomContent`, `customContentStyle`), drops `ngOnChanges` and widens the
 > `clickOnAvatar` payload to `Source | null`. Earlier notes — 22.7.0 (SCSS moved to `ng-hub-ui-avatar/styles`),
@@ -130,12 +133,12 @@ Then import the standalone component and use it in any template:
 
 ```typescript
 import { Component } from '@angular/core';
-import { AvatarComponent } from 'ng-hub-ui-avatar';
+import { HubAvatarComponent } from 'ng-hub-ui-avatar';
 
 @Component({
 	selector: 'app-profile',
 	standalone: true,
-	imports: [AvatarComponent],
+	imports: [HubAvatarComponent],
 	template: `<hub-avatar name="John Doe" [round]="true" size="64"></hub-avatar>`
 })
 export class ProfileComponent {}
@@ -145,7 +148,7 @@ export class ProfileComponent {}
 
 ## Usage
 
-`<hub-avatar>` is a **standalone** component: import `AvatarComponent` directly into the `imports` of any standalone component (as shown above). No `NgModule` is required.
+`<hub-avatar>` is a **standalone** component: import `HubAvatarComponent` directly into the `imports` of any standalone component (as shown above). No `NgModule` is required.
 
 ### Configuration (`provideAvatar`)
 
@@ -165,7 +168,7 @@ bootstrapApplication(AppComponent, {
 });
 ```
 
-> **Legacy `NgModule` — deprecated, removed in 23.0.0:** `AvatarModule` only re-exports the standalone component, and `AvatarModule.forRoot(config)` writes the same `AVATAR_CONFIG` token `provideAvatar()` does. Both keep working until 23.0.0, the release that moves this library to Angular 23; import `AvatarComponent` and register `provideAvatar()` instead. See `BREAKING_CHANGES.md`.
+> **Legacy `NgModule` — deprecated, removed in 23.0.0:** `AvatarModule` only re-exports the standalone component, and `AvatarModule.forRoot(config)` writes the same `AVATAR_CONFIG` token `provideAvatar()` does. Both keep working until 23.0.0, the release that moves this library to Angular 23; import `HubAvatarComponent` and register `provideAvatar()` instead. See `BREAKING_CHANGES.md`.
 
 `AvatarConfig` fields:
 

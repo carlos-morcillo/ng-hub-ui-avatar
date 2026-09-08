@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.12.0] - 2026-09-08
+
+### Changed
+
+- **The two exported classes carry the `Hub` prefix: `HubAvatarComponent` and `HubAvatarService`.**
+  A bare `AvatarComponent` is a name in the consumer's own namespace, not in ours. The day their
+  application grows an avatar component of its own — and an application with users generally does —
+  the two collide in whichever file imports both, and the only way out is an import alias on our
+  side of the line, for a name we never had the right to take. Every other class in this family is
+  already prefixed; these two were the leftovers. Nothing about the components changed: same
+  selector, same inputs, same behaviour, same injectable.
+- **`AvatarModule` keeps its name**, deliberately. It is already announced for removal in 23.0.0, so
+  a prefixed spelling would be born deprecated and die in the same release.
+
+### Deprecated
+
+- **`AvatarComponent` and `AvatarService` are now deprecated aliases**, kept so nothing breaks
+  today, and removed in **23.0.0** — the release that moves this family to Angular 23. Each is a
+  re-export of the prefixed class, so a codebase importing the old name keeps compiling and keeps
+  getting the very same class: `AvatarComponent === HubAvatarComponent` and
+  `AvatarService === HubAvatarService`, which is pinned by a test rather than promised in prose.
+
+### Added
+
+- **A test reads the exported surface back from the compiled module** and fails on any class that
+  ships without the `Hub` prefix, save the two aliases and `AvatarModule`. A naming rule nothing
+  enforces is one class away from being false: the next export lands unprefixed and nobody notices
+  until a consumer's own `AvatarComponent` collides with it.
+- **`ng-hub-ui-ds` is declared as an optional peer dependency** (`>=22.0.0`). The avatar's colours
+  and radii resolve through the family's `--hub-sys-*` / `--hub-ref-*` ladder, and the manifest said
+  nothing about it — so a consumer reading the package on npm could not tell which package supplies
+  them. It stays optional: every token ends in a literal fallback.
+
 ## [22.11.1] - 2026-09-08
 
 ### Deprecated

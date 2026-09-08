@@ -33,7 +33,7 @@ export const defaultDisableSrcCache = false;
  * Provides utilities methods related to Avatar component
  */
 @Injectable({ providedIn: 'root' })
-export class AvatarService {
+export class HubAvatarService {
 	public avatarSources: AvatarSource[] = defaultSources;
 	public avatarColors: string[] = defaultColors;
 

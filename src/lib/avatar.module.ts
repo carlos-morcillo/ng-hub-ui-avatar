@@ -2,19 +2,19 @@ import { ModuleWithProviders, NgModule } from '@angular/core';
 
 import { AvatarConfig } from './avatar-config';
 import { AVATAR_CONFIG } from './avatar-config.token';
-import { AvatarComponent } from './avatar.component';
+import { HubAvatarComponent } from './avatar.component';
 
 /**
  * Backward-compatibility module for `<hub-avatar>`.
  *
- * @deprecated `AvatarComponent` is now a standalone component. Import it directly
- * (`imports: [AvatarComponent]`) and, if you need custom configuration, register
+ * @deprecated `HubAvatarComponent` is now a standalone component. Import it directly
+ * (`imports: [HubAvatarComponent]`) and, if you need custom configuration, register
  * `provideAvatar()` in your application providers. This module only re-exports the
  * standalone component. Scheduled for removal in **23.0.0**.
  */
 @NgModule({
-	imports: [AvatarComponent],
-	exports: [AvatarComponent]
+	imports: [HubAvatarComponent],
+	exports: [HubAvatarComponent]
 })
 export class AvatarModule {
 	/**

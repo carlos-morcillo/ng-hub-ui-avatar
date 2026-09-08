@@ -1,23 +1,23 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
-import { AvatarService } from './avatar.service';
+import { HubAvatarService } from './avatar.service';
 import { AvatarSource } from './sources/avatar-source.enum';
 import { AvatarConfigService } from './avatar-config.service';
 import { Gravatar } from './sources/gravatar';
 import { provideHttpClient } from '@angular/common/http';
 
-describe('AvatarService', () => {
-	let avatarService: AvatarService;
+describe('HubAvatarService', () => {
+	let avatarService: HubAvatarService;
 	let httpMock: HttpTestingController;
 
 	describe('Avatar service with default configuration', () => {
 		beforeEach(() => {
 			TestBed.configureTestingModule({
-				providers: [AvatarService, AvatarConfigService, provideHttpClient(), provideHttpClientTesting()]
+				providers: [HubAvatarService, AvatarConfigService, provideHttpClient(), provideHttpClientTesting()]
 			});
 
-			avatarService = TestBed.inject(AvatarService);
+			avatarService = TestBed.inject(HubAvatarService);
 			httpMock = TestBed.inject(HttpTestingController);
 		});
 
