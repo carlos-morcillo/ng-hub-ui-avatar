@@ -2,6 +2,32 @@
 
 This document details the breaking changes introduced in major versions of `ng-hub-ui-avatar` and how to migrate your codebase.
 
+## [22.11.1] - 2026-09-08
+
+### Announced: `AvatarModule` is removed in 23.0.0
+
+- **Change**: the deprecation notice now names the release. Nothing is removed here and nothing
+  changes at runtime — this release is the notice, and the removal lands in 23.0.0, the next
+  version that tracks a new Angular major. `AvatarModule.forRoot()` goes with it.
+- **Impact**: from 23.0.0 both symbols are gone from the entry point, so
+  `import { AvatarModule }`, `imports: [AvatarModule]` and `AvatarModule.forRoot(config)` stop
+  compiling.
+- **Migration**: import the standalone component the module re-exported, and move the
+  configuration to `provideAvatar()`, which is where it already lives — `forRoot()` only wrote the
+  same `AVATAR_CONFIG` token.
+
+```ts
+// Before
+@NgModule({ imports: [AvatarModule.forRoot({ colors: ['#1abc9c'] })] })
+export class AppModule {}
+
+// After
+@Component({ imports: [AvatarComponent] })
+export class ProfileComponent {}
+
+bootstrapApplication(App, { providers: [provideAvatar({ colors: ['#1abc9c'] })] });
+```
+
 ## [22.10.0] - 2026-09-06
 ### The avatar's render state is internal, and `ngOnChanges` is gone
 

@@ -10,7 +10,7 @@ import { AvatarComponent } from './avatar.component';
  * @deprecated `AvatarComponent` is now a standalone component. Import it directly
  * (`imports: [AvatarComponent]`) and, if you need custom configuration, register
  * `provideAvatar()` in your application providers. This module only re-exports the
- * standalone component and will be removed in a future major version.
+ * standalone component. Scheduled for removal in **23.0.0**.
  */
 @NgModule({
 	imports: [AvatarComponent],
@@ -19,7 +19,8 @@ import { AvatarComponent } from './avatar.component';
 export class AvatarModule {
 	/**
 	 * @deprecated Use `provideAvatar(config)` with the standalone APIs instead.
-	 * Kept so existing `AvatarModule.forRoot()` consumers keep working.
+	 * Kept so existing `AvatarModule.forRoot()` consumers keep working; it goes with the
+	 * module in **23.0.0**.
 	 */
 	static forRoot(avatarConfig?: AvatarConfig): ModuleWithProviders<AvatarModule> {
 		return {

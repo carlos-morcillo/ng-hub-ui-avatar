@@ -8,7 +8,10 @@
 
 A universal avatar component for Angular applications that renders avatars from multiple sources (Gravatar, GitHub, Facebook, custom images, initials or plain text) and applies an automatic fallback strategy when a source fails.
 
-> **⚠️ BREAKING CHANGES:** 22.10.0 makes the avatar's render state internal (`avatarSrc`, `avatarText`,
+> **⚠️ BREAKING CHANGES:** 22.11.1 announces that `AvatarModule` and `AvatarModule.forRoot()` are
+> removed in 23.0.0, the next version that tracks a new Angular major — nothing changes at runtime yet,
+> and the migration is `AvatarComponent` plus `provideAvatar()`.
+> 22.10.0 makes the avatar's render state internal (`avatarSrc`, `avatarText`,
 > `avatarStyle`, `hostStyle`, `hasCustomContent`, `customContentStyle`), drops `ngOnChanges` and widens the
 > `clickOnAvatar` payload to `Source | null`. Earlier notes — 22.7.0 (SCSS moved to `ng-hub-ui-avatar/styles`),
 > 22.3.0 (`status` replaced by `badge` + `badgeColor`) and 21.1.0 (no stylesheet import) — are in
@@ -162,7 +165,7 @@ bootstrapApplication(AppComponent, {
 });
 ```
 
-> **Legacy `NgModule` (deprecated):** `AvatarModule` is still exported for backward compatibility and now only re-exports the standalone component. It is **deprecated** — prefer `AvatarComponent` + `provideAvatar()`. `AvatarModule.forRoot(config)` still works too.
+> **Legacy `NgModule` — deprecated, removed in 23.0.0:** `AvatarModule` only re-exports the standalone component, and `AvatarModule.forRoot(config)` writes the same `AVATAR_CONFIG` token `provideAvatar()` does. Both keep working until 23.0.0, the release that moves this library to Angular 23; import `AvatarComponent` and register `provideAvatar()` instead. See `BREAKING_CHANGES.md`.
 
 `AvatarConfig` fields:
 

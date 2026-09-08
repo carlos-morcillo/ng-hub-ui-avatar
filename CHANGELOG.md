@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.11.1] - 2026-09-08
+
+### Deprecated
+
+- **The `AvatarModule` deprecation now names the release that removes it: 23.0.0.** "A future
+  major version" told a reader nothing they could plan against — in this ecosystem the major
+  tracks Angular's, so it is not an API decision anyone can anticipate from the changelog. 23.0.0
+  is the release that moves this library to Angular 23, which is a date a consumer already has to
+  plan for, and it is the same release the modules of `ng-hub-ui-modal`, `-portal`, `-calendar`,
+  `-skeleton`, `-stepper` and `-breadcrumbs` are removed in. `AvatarModule.forRoot()` goes with the
+  module. Nothing changes at runtime and nothing is removed here: both keep working exactly as
+  before, and the migration — `AvatarComponent` plus `provideAvatar()` — is written out in
+  [BREAKING_CHANGES.md](./BREAKING_CHANGES.md).
+
 ## [22.11.0] - 2026-09-07
 
 ### Added
